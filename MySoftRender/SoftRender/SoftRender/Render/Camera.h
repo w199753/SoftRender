@@ -8,8 +8,23 @@ namespace softRD
 	public:
 		Camera() {}
 		~Camera() {}
+		//设置透视投影参数
+		void SetProjectParams()
+		{
 
-		void SetCameraParams()
+		}
+		//设置视口参数
+		void SetViewportParams()
+		{
+
+		}
+		//设置视图变换所需参数
+		void SetViewParams()
+		{
+
+		}
+		//设置变换参数
+		void SetTransformParam()
 		{
 
 		}
@@ -21,7 +36,7 @@ namespace softRD
 		//相机viewportRect参数
 		float X, Y, W, H;
 
-		glm::vec3 up, right, forward;
+		glm::vec3 up, right, forward,position;
 		glm::mat4x4 viewMatrix;
 		glm::mat4x4 projectMatrix;
 		glm::mat4x4 viewportMatrix;
