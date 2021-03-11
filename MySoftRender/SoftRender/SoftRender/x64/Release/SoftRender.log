@@ -1,0 +1,9 @@
+﻿  Program.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.18362.0\shared\minwindef.h(130,1): warning C4005: “APIENTRY”: 宏重定义
+C:\Users\Betta\Desktop\pj\opengl\include\glad\glad.h(32): message : 参见“APIENTRY”的前一个定义
+  正在生成代码
+  223 of 259 functions (86.1%) were compiled, the rest were copied from previous compilation.
+    203 functions were new in current compilation
+    2 functions had inline decision re-evaluated but remain unchanged
+  已完成代码的生成
+  SoftRender.vcxproj -> C:\Users\Betta\Desktop\MySoftRender\SoftRender\x64\Release\SoftRender.exe
