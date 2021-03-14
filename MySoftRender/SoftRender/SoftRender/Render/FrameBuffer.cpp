@@ -1,5 +1,5 @@
 #include "FrameBuffer.h"
-#include "../Common/Global.hpp"
+#include "../Common/Global.h"
 #include<algorithm>
 
 using namespace softRD;
@@ -41,5 +41,6 @@ void FrameBuffer::WriteColor(int x, int y, const glm::vec4& col)
 glm::vec4 FrameBuffer::GetColor(int x, int y)
 {
 	int xy = 4 * (y * width + x);
+	float oneDiv255 = 1 / 255.f;
 	return glm::vec4(colorBuffer[xy],colorBuffer[xy+1],colorBuffer[xy+2],colorBuffer[xy+3])*oneDiv255;
 }

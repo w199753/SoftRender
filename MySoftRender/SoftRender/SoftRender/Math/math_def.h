@@ -5,8 +5,8 @@
 //»¡¶È=½Ç¶È*pi/180
 #define EQUAL_PRECISION 0.001f
 #define PI 3.1415f
-#define DEG2RAD 0.0174532924f
-#define RAD2DEG 57.29578f
+//#define DEG2RAD 0.0174532924f
+//#define RAD2DEG 57.29578f
 
 #define DIV_255 0.0039215686f
 

@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string.h>
 #include "Render/FrameBuffer.h"
+#include "Render/Object.h"
+#include"Shade/PhongShader.h"
 using namespace std;
 using namespace softRD;
 void processInput(GLFWwindow *window)
@@ -38,9 +40,47 @@ void showfps(GLFWwindow* window)
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+using namespace std;
+
+class AA
+{
+public:
+	int aaa;
+};
+
+class BB:public AA
+{
+public:
+	int bbb;
+};
+
 int main()
 {
+	//std::unique_ptr<Camera> main = ;
+	Global::mainCamera = std::make_unique<Camera>();
+	Global::mainCamera->SetViewportParams(0, 0, 800.f, 600.f);
+	Global::mainCamera->SetTransformParam(glm::vec3(0,0,1), glm::vec3(0, 0, 1)+glm::vec3(0, 0, -1), glm::vec3(0));
+	Global::mainCamera->SetProjectParams(1.f, 100.f, 60.f, 800.f / 600.f);
 
+	Global::frameBuffer = std::make_unique<FrameBuffer>(800, 600);
+
+	Global::raster = std::make_unique<Rasterization>();
+
+	PropertyBlock block;
+	Transform* trans = new Transform();
+	trans->SetScale(0.1, 0.1, 0.1);
+	block.SetTransform(trans);
+	std::unique_ptr<Shader> shader = std::make_unique<PhongShader>(block);
+	Material obj_material;
+	obj_material.SetShader(std::move(shader));
+	Object obj("Model/Test.obj",obj_material);
+
+
+	
+
+	//Test* tt = new Test();
+	//change(tt,200);
+	//std::cout << tt->aaa << std::endl;
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -66,7 +106,6 @@ int main()
 		return -1;
 	}
 
-	FrameBuffer fb(800, 600);
 
 	std::thread showFPS(showfps, window);
 	showFPS.detach();
@@ -74,20 +113,21 @@ int main()
 	{
 		processInput(window);
 
-		fb.ClearBuffer(BuffersType::COLOR | BuffersType::DEPTH);
+		Global::frameBuffer->ClearBuffer(BuffersType::COLOR | BuffersType::DEPTH);
 
-		//for (int i = 0; i < 100; i++)
+		//for (int i = 0; i < 200; i++)
 		//{
-		//	for (int j = 0; j < 100; j++)
-		//	fb.WriteColor(i,j, glm::vec4(1));
+		//	for (int j = 0; j < 200; j++)
+		//		Global::frameBuffer->WriteColor(i,j, glm::vec4(1));
 		//}
+		obj.RenderObject();
 		
 		//
 		////
 		////glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		////glClear(GL_COLOR_BUFFER_BIT);
 		////
-		glDrawPixels(fb.width, fb.height, GL_RGBA, GL_UNSIGNED_BYTE, fb.colorBuffer.data());
+		glDrawPixels(Global::frameBuffer->width, Global::frameBuffer->height, GL_RGBA, GL_UNSIGNED_BYTE, Global::frameBuffer->colorBuffer.data());
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		fps++;

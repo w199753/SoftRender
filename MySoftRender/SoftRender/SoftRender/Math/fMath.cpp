@@ -42,6 +42,7 @@ glm::mat4 fMath::GetTranslateMatrix(const glm::vec3 & v)
 glm::mat4 fMath::GetXRotateMatrix(const float p)
 {
 	glm::mat4 res(1);
+	float DEG2RAD = 0.0174532924f;
 	float radian = p*DEG2RAD;
 	res[1][1] = cos(radian);
 	res[1][2] = -sin(radian);
@@ -53,6 +54,7 @@ glm::mat4 fMath::GetXRotateMatrix(const float p)
 glm::mat4 fMath::GetYRotateMatrix(const float p)
 {
 	glm::mat4 res(1);
+	float DEG2RAD = 0.0174532924f;
 	float radian = p*DEG2RAD;
 	res[0][0] = cos(radian);
 	res[0][2] = sin(radian);
@@ -64,6 +66,7 @@ glm::mat4 fMath::GetYRotateMatrix(const float p)
 glm::mat4 fMath::GetZRotateMatrix(const float p)
 {
 	glm::mat4 res(1);
+	float DEG2RAD = 0.0174532924f;
 	float radian = p*DEG2RAD;
 	res[0][0] = cos(radian);
 	res[0][1] = -sin(radian);
