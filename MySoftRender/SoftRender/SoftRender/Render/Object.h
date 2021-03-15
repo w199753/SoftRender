@@ -17,20 +17,20 @@ namespace softRD
 		}
 		~Object() {}
 
-		//void SetTranslate(const float x, const float y, const float z)
-		//{
-		//	trans.SetTranslate(x, y, z);
-		//}
-		//
-		//void SetSclae(const float x, const float y, const float z)
-		//{
-		//	trans.SetScale(x, y, z);
-		//}
-		//
-		//void SetRotate(const float x, const float y, const float z)
-		//{
-		//	trans.SetRotate(x, y, z);
-		//}
+		void SetTranslate(const float x, const float y, const float z)
+		{
+			material.shader->block.transform->SetTranslate(x, y, z);
+		}
+		
+		void SetScale(const float x, const float y, const float z)
+		{
+			material.shader->block.transform->SetScale(x, y, z);
+		}
+		
+		void SetRotate(const float x, const float y, const float z)
+		{
+			material.shader->block.transform->SetRotate(x, y, z);
+		}
 
 		void RenderObject()
 		{
@@ -42,7 +42,6 @@ namespace softRD
 		Mesh GetMesh()const { return mesh; }
 	private:
 		Mesh mesh;
-		//std::unique_ptr<Transform> trans;
 		Material& material;
 	};
 

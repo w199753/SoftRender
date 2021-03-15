@@ -8,25 +8,57 @@
 #include "../Shade/V2f.h"
 namespace softRD
 {
+	enum class RasterType
+	{
+		Fill = 1,
+		Line = 2,
+	};
+	inline RasterType operator |(RasterType a, RasterType b)
+	{
+		return RasterType((int)a | (int)b);
+	}
+	inline RasterType operator &(RasterType a, RasterType b)
+	{
+		return RasterType((int)a & (int)b);
+	}
 	class Rasterization
 	{
 	public:
 		Rasterization() {}
 		~Rasterization() {}
 
+		void SetRasterType(RasterType _type)
+		{
+			type = _type;
+		}
+
 		void RasterTriangle(const V2f& o1, const V2f& o2, const V2f& o3)
+		{
+			if ((type & RasterType::Line) == RasterType::Line)
+			{
+				RasterLine(o1, o2);
+				RasterLine(o2, o3);
+				RasterLine(o3, o1);
+			}
+			if ((type & RasterType::Fill) == RasterType::Fill)
+			{
+				RasterFill(o1, o2, o3);
+			}
+		}
+
+		void RasterFill(const V2f& o1, const V2f& o2, const V2f& o3)
 		{
 			int x1, y1, x2, y2;
 			GetBoundBox(o1.windowPos, o2.windowPos, o3.windowPos, x1, y1, x2, y2);
 			//cout << o1.texcoord <<"      "<< o2.texcoord << "      " << o3.texcoord << endl;
-			std::cout << x1 << "xx" << y1 << "xx" << x2 << " " << y2 << std::endl;
+			//std::cout << x1 << "xx" << y1 << "xx" << x2 << " " << y2 << std::endl;
 			x1 = fMath::Clamp(x1, 0, 800);
 			x2 = fMath::Clamp(x2, 0, 800);
 			y1 = fMath::Clamp(y1, 0, 600);
 			y2 = fMath::Clamp(y2, 0, 600);
-			for (int i = x1; i <= x2-1; i++)
+			for (int i = x1; i <= x2; i++)
 			{
-				for (int j = y1; j <= y2-1; j++)
+				for (int j = y1; j <= y2; j++)
 				{
 					//std::cout << i << " " << j << std::endl;
 					//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
@@ -38,7 +70,7 @@ namespace softRD
 						{
 							V2f o;
 							//重心坐标可能会变，需要明天找解决办法(好像是变换回去，在进行一次中心坐标插值,还是不太懂。。。。。
-							o = o1*centric.x + o2*centric.y + o3*centric.z;
+							o = o1 * centric.x + o2 * centric.y + o3 * centric.z;
 							//o = o * (1/o.Z);
 							//float divZ = (1.0f / o.Z);
 							////cout << o.Z << endl;
@@ -58,16 +90,65 @@ namespace softRD
 				}
 			}
 		}
-		void RasterLine()
+		void RasterLine(const V2f& from,const V2f& to)
 		{
-
+			int dx = to.windowPos.x - from.windowPos.x;
+			int dy = to.windowPos.y - from.windowPos.y;
+			int xDelta = 1, yDelta = 1;
+			if (dx<0)
+			{
+				xDelta = -xDelta;
+				dx = -dx;
+			}
+			if (dy<0)
+			{
+				yDelta = -yDelta;
+				dy = -dy;
+			}
+			int currentX = from.windowPos.x;
+			int currentY = from.windowPos.y;
+			V2f tmp;
+			//斜率小于1
+			if (dy <= dx)
+			{
+				int P = 2 * dy - dx;
+				for (int i = 0; i <= dx; ++i)
+				{
+					tmp = fMath::Lerp(from, to, ((float)(i) / dx));
+					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(1));
+					currentX += xDelta;
+					if (P <= 0)
+						P += 2 * dy;
+					else
+					{
+						currentY += yDelta;
+						P += 2 * (dy - dx);
+					}
+				}
+			}
+			//斜率大于1，利用对称性画
+			else
+			{
+				int P = 2 * dx - dy;
+				for (int i = 0; i <= dy; ++i)
+				{
+					tmp = fMath::Lerp(from, to, ((float)(i) / dy));
+					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(1));
+					currentY += yDelta;
+					if (P <= 0)
+						P += 2 * dx;
+					else
+					{
+						currentX += xDelta;
+						P -= 2 * (dy - dx);
+					}
+				}
+			}
 		}
 
 		bool InsideTriangle(int x, int y, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3)
 		{
-			float xx = x + .5f;
-			float yy = y + .5f;
-			glm::vec3 p(xx, yy, 0);
+			glm::vec3 p(x, y, 0);
 			auto a = glm::cross((p - v1), (v2 - v1));
 			auto b = glm::cross((p - v2), (v3 - v2));
 			auto c = glm::cross((p - v2), (v1 - v3));
@@ -75,7 +156,6 @@ namespace softRD
 				return true;
 			return
 				false;
-			// TODO : Implement this function to check if the point (x, y) is inside the triangle represented by _v[0], _v[1], _v[2]
 		}
 
 		void Rasterization::GetBoundBox(const glm::vec4& o1, const glm::vec4& o2, const glm::vec4& o3, int& x1, int& y1, int& x2, int& y2)
@@ -90,5 +170,6 @@ namespace softRD
 
 	private:
 		std::vector < std::function<int(int)>> hh;
+		RasterType type = RasterType::Fill;
 	};
 }

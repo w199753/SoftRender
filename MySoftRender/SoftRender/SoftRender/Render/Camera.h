@@ -55,8 +55,8 @@ namespace softRD
 		{
 			position = pos;
 			forward = glm::normalize(lookat - pos);
-			right = glm::normalize(glm::cross(forward,worldUpDir ));
-			up = glm::normalize(glm::cross(right,forward));
+			right = glm::normalize(glm::cross(worldUpDir, forward));
+			up = glm::normalize(glm::cross(forward, right));
 			viewMatrix = glm::mat4x4(right.x,up.x,-forward.x,0.f,
 									right.y,up.y,-forward.y,0.f,
 									right.z,up.z,-forward.z,0.f,

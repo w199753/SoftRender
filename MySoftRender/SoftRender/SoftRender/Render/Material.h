@@ -69,29 +69,27 @@ namespace softRD
 				//cout <<"xxxxxx"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 				if (PreRasterSetting(o1,o2,o3))
 				{
-					cout << "***********" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
+					//cout << "***********" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 					//cout <<"vvvvvvvvv"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 					Global::raster->RasterTriangle(o1, o2, o3);
 				}
 			}
 		}
+		std::unique_ptr<Shader> shader;
 	private:
 		ShadingType type = ShadingType::Phong;
-		std::unique_ptr<Shader> shader;
+
 
 		bool PreRasterSetting(V2f& o1,V2f& o2,V2f& o3)
 		{
-			cout << "---------" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z<<" "<<o1.windowPos.w << endl;
 			PerspectiveDivision(o1);
 			PerspectiveDivision(o2);
 			PerspectiveDivision(o3);
 
-			cout << "---------" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w<< endl;
 			//�ӿڱ任
 			o1.windowPos = Global::mainCamera->viewportMatrix * o1.windowPos;
 			o2.windowPos = Global::mainCamera->viewportMatrix * o2.windowPos;
 			o3.windowPos = Global::mainCamera->viewportMatrix * o3.windowPos;
-			cout << "---------" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 			return true;
 		}
 

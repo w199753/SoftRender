@@ -7,18 +7,18 @@ namespace softRD
 	class PropertyBlock
 	{
 	public:
-		PropertyBlock() {}
+		PropertyBlock() { transform = std::make_unique<Transform>(); }
 
 		~PropertyBlock() {}
 
-		void SetTransform(Transform* _transform)
+		void SetTransform(std::unique_ptr<Transform> _transform)
 		{
-			transform = _transform;
+			transform = std::move(_transform);
 		}
 
 		std::unique_ptr<Texture> albedo;
 		//后面还有pbr的一坨贴图 metallic,roughness,normal,ao ..
-		Transform* transform;
+		std::unique_ptr<Transform> transform;
 	private:
 
 	};

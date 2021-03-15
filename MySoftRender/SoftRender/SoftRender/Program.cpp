@@ -46,7 +46,20 @@ class AA
 {
 public:
 	int aaa;
+	AA() { cout << "cons aa" << endl;  }
+	AA(const AA& a)
+	{
+		cout << "aa" << endl;
+		aaa = a.aaa;
+	}
+
+	AA& operator = (const AA& a)
+	{
+		cout << "bb" << endl;
+		return *this;
+	}
 };
+
 
 class BB:public AA
 {
@@ -56,25 +69,25 @@ public:
 
 int main()
 {
+
 	//std::unique_ptr<Camera> main = ;
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, 800.f, 600.f);
-	Global::mainCamera->SetTransformParam(glm::vec3(0,0,1), glm::vec3(0, 0, 1)+glm::vec3(0, 0, -1), glm::vec3(0));
+	Global::mainCamera->SetTransformParam(glm::vec3(0,0,1), glm::vec3(0, 0, 1)+glm::vec3(0, 0, 1), glm::vec3(0));
 	Global::mainCamera->SetProjectParams(1.f, 100.f, 60.f, 800.f / 600.f);
 
 	Global::frameBuffer = std::make_unique<FrameBuffer>(800, 600);
 
 	Global::raster = std::make_unique<Rasterization>();
+	Global::raster->SetRasterType(RasterType::Line|RasterType::Fill);
 
 	PropertyBlock block;
-	Transform* trans = new Transform();
-	trans->SetScale(0.1, 0.1, 0.1);
-	block.SetTransform(trans);
 	std::unique_ptr<Shader> shader = std::make_unique<PhongShader>(block);
 	Material obj_material;
 	obj_material.SetShader(std::move(shader));
-	Object obj("Model/Test.obj",obj_material);
-
+	Object obj("Model/face.obj",obj_material);
+	obj.SetScale(0.3, 0.3, 0.3);
+	obj.SetTranslate(0.3, 0.3, 0);
 
 	
 
@@ -133,7 +146,7 @@ int main()
 		fps++;
 	}
 
-
+	//Global::mainCamera.release();
 	glfwTerminate();
 	return 0;
 }

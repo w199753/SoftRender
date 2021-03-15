@@ -3,12 +3,13 @@
 #include<glm/matrix.hpp>
 #include"V2f.h"
 #include"../Render/Vertex.h"
+#include"../Render/PropertyBlock.h"
 namespace softRD
 {
 	class Shader
 	{
 	public:
-		Shader() {}
+		Shader(PropertyBlock& _block):block(_block) {}
 		~Shader() {}
 
 		virtual V2f VertexShader(const Vertex& vertex) = 0;
@@ -23,6 +24,7 @@ namespace softRD
 		//
 		//	
 		//}
+		PropertyBlock& block;
 	private:
 		
 	};

@@ -10,7 +10,8 @@ namespace softRD
 	{
 	public:
 
-		PhongShader(PropertyBlock& _block) :block(_block) {}
+		using Shader::Shader;
+		//PhongShader(PropertyBlock& _block) :Shader(_block) {}
 		~PhongShader() {}
 
 		V2f VertexShader(const Vertex& vertex) override
@@ -29,7 +30,7 @@ namespace softRD
 			//cout << vertex.position.x<<" "<<vertex.position.y<<" "<<vertex.position.z << "        " << o.worldPos.x<<" "<< o.worldPos.y<<" "<< o.worldPos.z << endl;
 			//cout << o.worldPos<<">>>"<<v.position << endl;
 			o.windowPos = Global::mainCamera->projectMatrix * Global::mainCamera->viewMatrix * o.worldPos;
-			cout << "??????????---------" << o.windowPos.x << " " << o.windowPos.y << " " << o.windowPos.z << " " << o.windowPos.w << endl;
+			//cout << "??????????---------" << o.windowPos.x << " " << o.windowPos.y << " " << o.windowPos.z << " " << o.windowPos.w << endl;
 			return o;
 		}
 
@@ -38,7 +39,7 @@ namespace softRD
 			return glm::vec4();
 		}
 
-		PropertyBlock& block;
+		
 	private:
 
 	};

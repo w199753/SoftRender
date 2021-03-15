@@ -10,11 +10,14 @@ namespace softRD
 
 		void SetTranslate(const float x,const float y,const float z)
 		{
-
+			translateMatrix[3][0] = x;
+			translateMatrix[3][1] = y;
+			translateMatrix[3][2] = z;
 		}
 
 		void SetRotate(const float x, const float y, const float z)
 		{
+			float DEG2RAD = 0.0174532924f;
 
 		}
 		void SetScale(const float x, const float y, const float z)
