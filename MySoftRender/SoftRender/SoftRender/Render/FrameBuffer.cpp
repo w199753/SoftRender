@@ -38,6 +38,26 @@ void FrameBuffer::WriteColor(int x, int y, const glm::vec4& col)
 	*(colItr + 3) = col.w * 255;
 }
 
+void softRD::FrameBuffer::WriteDepth(int x, int y, const float v)
+{
+	if (x < 0 || x >= width || y < 0 || y >= height)
+	{
+		return;
+	}
+	int xy = (y * width + x);
+	depthBuffer[xy] = v;
+}
+
+float softRD::FrameBuffer::GetDepth(int x, int y)
+{
+	if (x < 0 || x >= width || y < 0 || y >= height)
+	{
+		return std::numeric_limits<float>::infinity();
+	}
+	int xy = (y * width + x);
+	return depthBuffer[xy];
+}
+
 glm::vec4 FrameBuffer::GetColor(int x, int y)
 {
 	int xy = 4 * (y * width + x);

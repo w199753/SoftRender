@@ -35,7 +35,10 @@ namespace softRD
 
 		void ClearBuffer(BuffersType type);
 		void WriteColor(int x, int y, const glm::vec4& col);
+		void WriteDepth(int x, int y, const float v);
+		float GetDepth(int x, int y);
 		glm::vec4 GetColor(int x, int y);
+
 
 		int width, height;
 		std::vector<unsigned char> colorBuffer;   //unsigned用来表示byte char（-128，127）   unsigned char（0-255）

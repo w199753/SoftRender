@@ -7,7 +7,7 @@ namespace softRD
 	public:
 		V2f() {}
 		~V2f() {}
-		
+
 		V2f(const V2f& v2f)
 		{
 			worldPos = v2f.worldPos;
@@ -36,12 +36,12 @@ namespace softRD
 		V2f operator*(const float p)const
 		{
 			V2f o;
-			o.worldPos *= p;
-			o.windowPos *= p;
-			o.normal *= p;
-			o.color *= p;
-			o.texcoord *= p;
-			o.Z *= p;
+			o.worldPos = worldPos * p;
+			o.windowPos = windowPos * p;
+			o.normal = p * normal;
+			o.color = p * color;
+			o.texcoord = p * texcoord;
+			o.Z = p * Z;
 			return o;
 		}
 

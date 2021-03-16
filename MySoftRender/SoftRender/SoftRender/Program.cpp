@@ -69,25 +69,35 @@ public:
 
 int main()
 {
-
+	glm::mat4x4 mm(1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4);
+	glm::mat4x4 xx(1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
+	mm = mm * xx;
+	for (size_t i = 0; i < 4; i++)
+	{
+		for (size_t j = 0; j < 4; j++)
+		{
+			std::cout << mm[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
 	//std::unique_ptr<Camera> main = ;
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, 800.f, 600.f);
-	Global::mainCamera->SetTransformParam(glm::vec3(0,0,1), glm::vec3(0, 0, 1)+glm::vec3(0, 0, 1), glm::vec3(0));
+	Global::mainCamera->SetTransformParam(glm::vec3(0,0,1), glm::vec3(0, 0, 1)+ glm::vec3(0, 0, -1), glm::vec3(0));
 	Global::mainCamera->SetProjectParams(1.f, 100.f, 60.f, 800.f / 600.f);
 
 	Global::frameBuffer = std::make_unique<FrameBuffer>(800, 600);
 
 	Global::raster = std::make_unique<Rasterization>();
-	Global::raster->SetRasterType(RasterType::Line|RasterType::Fill);
+	Global::raster->SetRasterType(RasterType::Line| RasterType::Fill);
 
 	PropertyBlock block;
 	std::unique_ptr<Shader> shader = std::make_unique<PhongShader>(block);
 	Material obj_material;
 	obj_material.SetShader(std::move(shader));
-	Object obj("Model/face.obj",obj_material);
+	Object obj("Model/Test.obj",obj_material);
 	obj.SetScale(0.3, 0.3, 0.3);
-	obj.SetTranslate(0.3, 0.3, 0);
+	obj.SetTranslate(0.4, 0.3, 0);
 
 	
 

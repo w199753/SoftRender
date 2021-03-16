@@ -3,6 +3,7 @@
 #include "../Shade/Shader.h"
 #include"PropertyBlock.h"
 #include"Rasterization.h"
+#include"CullSystem.h"
 #include"Camera.h"
 #include"Mesh.h"
 #include<memory>
@@ -78,7 +79,7 @@ namespace softRD
 		std::unique_ptr<Shader> shader;
 	private:
 		ShadingType type = ShadingType::Phong;
-
+		CullSystem cull;
 
 		bool PreRasterSetting(V2f& o1,V2f& o2,V2f& o3)
 		{
@@ -86,6 +87,11 @@ namespace softRD
 			PerspectiveDivision(o2);
 			PerspectiveDivision(o3);
 
+			//cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << endl;
+			if (cull.FaceCull(false,o1,o2,o3))
+			{
+				return false;
+			}
 			//�ӿڱ任
 			o1.windowPos = Global::mainCamera->viewportMatrix * o1.windowPos;
 			o2.windowPos = Global::mainCamera->viewportMatrix * o2.windowPos;

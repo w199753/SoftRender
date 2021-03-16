@@ -1,5 +1,6 @@
 #pragma once
 #include<glm/vector_relational.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include<glm/matrix.hpp>
 #include"../Common/Global.h"
 #include"Transform.hpp"
@@ -27,6 +28,7 @@ namespace softRD
 			projectMatrix[2][3] = -1.f;
 			projectMatrix[3][2] = -(2 * _near * _far) / (_far - _near);
 
+			//projectMatrix = glm::perspectiveFovRH(_fov*DEG2RAD, 800.f, 600.f, _near, _far);
 		}
 		//设置视口参数
 		void SetViewportParams(int _x,int _y,int _width,int _height)
@@ -54,13 +56,22 @@ namespace softRD
 		void SetTransformParam(const glm::vec3& pos,const glm::vec3& lookat,const glm::vec3& eulerAngle)
 		{
 			position = pos;
-			forward = glm::normalize(lookat - pos);
-			right = glm::normalize(glm::cross(worldUpDir, forward));
-			up = glm::normalize(glm::cross(forward, right));
-			viewMatrix = glm::mat4x4(right.x,up.x,-forward.x,0.f,
-									right.y,up.y,-forward.y,0.f,
-									right.z,up.z,-forward.z,0.f,
-									-glm::dot(pos,right),-glm::dot(pos,up),-glm::dot(pos,forward),1.f);
+			forward = glm::normalize( lookat - pos);  //规定相机看向z的负半轴
+			std::cout << forward.x << " " << forward.y << " " << forward.z << std::endl;
+			right = glm::normalize(glm::cross(forward,worldUpDir));
+			up = glm::normalize(glm::cross(right, forward));
+			viewMatrix[0][0] = right.x;
+			viewMatrix[1][0] = right.y;
+			viewMatrix[2][0] = right.z;
+			viewMatrix[0][1] = up.x;
+			viewMatrix[1][1] = up.y;
+			viewMatrix[2][1] = up.z;
+			viewMatrix[0][2] = -forward.x;
+			viewMatrix[1][2] = -forward.y;
+			viewMatrix[2][2] = -forward.z;
+			viewMatrix[3][0] = -glm::dot(pos, right);
+			viewMatrix[3][1] = -glm::dot(pos, up);
+			viewMatrix[3][2] = -glm::dot(pos, forward);
 			for (size_t i = 0; i < 4; i++)
 			{
 				for (size_t j = 0; j < 4; j++)
@@ -69,12 +80,15 @@ namespace softRD
 				}
 				std::cout << std::endl;
 			}
+			viewMatrix = glm::lookAtRH(pos, lookat , worldUpDir);
+			
 			//viewMatrix = glm::transpose(viewMatrix);
 		}
 
 		glm::mat4x4 viewMatrix = glm::mat4x4(1);
 		glm::mat4x4 projectMatrix = glm::mat4x4(0);
 		glm::mat4x4 viewportMatrix = glm::mat4x4(1);
+		glm::vec3 up, right, forward, position;
 	private:
 		glm::vec3 worldUpDir = glm::vec3(0, 1, 0);
 
@@ -83,7 +97,7 @@ namespace softRD
 		//相机viewportRect参数
 		float X, Y, W, H;
 		
-		glm::vec3 up, right, forward,position;
+
 
 
 	};

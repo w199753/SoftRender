@@ -78,12 +78,17 @@ namespace softRD
 							//o.normal *= divZ;
 							//o.color *= divZ;
 							//o.texcoord *= divZ;
-							////if (o.windowPos.z<Global::frontBuufer->GetDepth(i, j))
-							//{
-							//	//Global::frontBuufer->WriteDepth(i, j, o.windowPos.z);
-							//	Global::frontBuufer->WritePoint(i, j, shader->FragmentShader(o));
-							//}
-							Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
+							//std::cout << centric.x << " " << centric.y << " " << centric.z << std::endl;
+							//std::cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << std::endl;
+							//std::cout << o2.windowPos.x << " " << o2.windowPos.y << " " << o2.windowPos.z << " " << o2.windowPos.w << std::endl;
+							//std::cout << o3.windowPos.x << " " << o3.windowPos.y << " " << o3.windowPos.z << " " << o3.windowPos.w << std::endl;
+							//std::cout << o.windowPos.x << " " << o.windowPos.y << " " << o.windowPos.z << " " << o.windowPos.w << std::endl;
+							if (o.windowPos.z< std::numeric_limits<float>::infinity())
+							{
+								Global::frameBuffer->WriteDepth(i, j, o.windowPos.z);
+								Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
+							}
+							//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
 						}
 					}
 
