@@ -101,7 +101,7 @@ namespace softRD
 		glm::mat4x4 viewMatrix = glm::mat4x4(1);
 		glm::mat4x4 projectMatrix = glm::mat4x4(0);
 		glm::mat4x4 viewportMatrix = glm::mat4x4(1);
-		glm::vec3 up, right, forward, position;
+		glm::vec3 up = glm::vec3(0), right = glm::vec3(0), forward = glm::vec3(0), position = glm::vec3(0);
 	private:
 		glm::vec3 const worldUpDir = glm::vec3(0, 1, 0);
 

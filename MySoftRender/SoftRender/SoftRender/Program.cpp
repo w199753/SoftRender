@@ -86,8 +86,17 @@ int main()
 	Material obj_material;
 	obj_material.SetShader(std::move(shader));
 	Object obj("Model/Test.obj",obj_material);
-	obj.SetScale(0.8, 0.8, 0.8);
+	obj.SetScale(1.3, 1.3, 0.8);
 	obj.SetTranslate(0, 0, 0);
+
+	//PropertyBlock block1;
+	//block1.albedo = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR);
+	//std::unique_ptr<Shader> shader1 = std::make_unique<PhongShader>(block1);
+	//Material obj_material1;
+	//obj_material1.SetShader(std::move(shader1));
+	//Object obj1("Model/Test.obj", obj_material1);
+	//obj1.SetScale(1, 1, 0.9);
+	//obj1.SetTranslate(0.5, 0, 0);
 
 	
 
@@ -134,7 +143,7 @@ int main()
 		//		Global::frameBuffer->WriteColor(i,j, glm::vec4(1));
 		//}
 		obj.RenderObject();
-		
+		//obj1.RenderObject();
 		//
 		////
 		////glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

@@ -14,7 +14,14 @@ namespace softRD
 		glm::vec3 biTangent;
 		glm::vec2 texcoord;
 
-		Vertex() {}
+		Vertex() {
+			position = glm::vec4(0);
+			color= glm::vec4(0);
+			normal= glm::vec3(0);
+			tangent= glm::vec4(0);
+			biTangent= glm::vec3(0);
+			texcoord= glm::vec2(0);
+		}
 		Vertex(const glm::vec4& pos, const glm::vec4& col, const glm::vec3& norm, const glm::vec2& tex) :
 			position(pos), color(col), normal(norm), texcoord(tex) {}
 		~Vertex() {

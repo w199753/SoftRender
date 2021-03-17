@@ -91,7 +91,7 @@ softRD::Texture& softRD::Texture::operator = (const Texture& t)
 glm::vec4 softRD::Texture::Sampler2D(const glm::vec2& uv)
 {
 	//std::cout  << uv.x << " ??????" << uv.y << std::endl;
-	glm::vec4 res;
+	glm::vec4 res = glm::vec4(0);
 	unsigned char* p;
 	float* fp;
 	if (txtType == TextureType::LDR)
@@ -104,6 +104,8 @@ glm::vec4 softRD::Texture::Sampler2D(const glm::vec2& uv)
 		fp = fData;
 		return internal_Sampler2D(uv, res, fp);
 	}
+	p = nullptr;
+	fp = nullptr;
 }
 
 

@@ -22,18 +22,65 @@ namespace softRD
 		return RasterType((int)a & (int)b);
 	}
 
-	struct raster_res
+	class raster_res
 	{
 	public:
 		raster_res() {}
-		raster_res(int _x, int _y,V2f* _o)
+		raster_res(int _x, int _y,const V2f& _o)
 		{
 			x = _x;
 			y = _y;
 			o = _o;
 		}
+		inline void setWindowpos(float x, float y, float z, float w)
+		{
+			//o.windowPos.x = x;
+			//o.windowPos.y = y;
+			//o.windowPos.z = z;
+			//o.windowPos.w = w;
+			o.windowPos = glm::vec4(x,y,z,w);
+		}
+
+		inline void setTexture(float x, float y)
+		{
+			o.texcoord = glm::vec2(x,y);
+			//o.texcoord.x = x;
+			//o.texcoord.y = y;
+		}
+
+		inline void setWorldpos(float x, float y, float z, float w)
+		{
+			o.worldPos = glm::vec4(x,y,z,w);
+			//o.worldPos.x = x;
+			//o.worldPos.y = y;
+			//o.worldPos.z = z;
+			//o.worldPos.w = w;
+		}
+
+		inline void setNormal(float x, float y, float z)
+		{
+			o.normal = glm::vec3(x,y,z);
+			//o.normal.x = x;
+			//o.normal.y = y;
+			//o.normal.z = z;
+		}
+
+		inline void setColor(float x, float y, float z,float w)
+		{
+			o.color = glm::vec4(x,y,z,w);
+			//o.color.x = x;
+			//o.color.y = y;
+			//o.color.z = z;
+			//o.color.w = w;
+		}
 		int x, y;
-		V2f* o;
+		V2f o;
+		glm::vec4 worldPos;
+		glm::vec4 windowPos;
+		glm::vec4 color;
+		glm::vec3 normal;
+		glm::vec2 texcoord;
+		float Z;
 	};
 	class Rasterization
 	{
@@ -114,9 +161,27 @@ namespace softRD
 								o.color *= divZ;
 								o.texcoord *= divZ;
 								Global::frameBuffer->WriteDepth(i, j, o.windowPos.z);
-								*resList = raster_res(i, j, &o);
+								(resList + index)->y = j;
+								(resList + index)->x = i;
+								(resList + index)->o = o;
+								//(resList + index)->setTexture(o.texcoord.x, o.texcoord.y);
+								//(resList + index)->setWindowpos(o.windowPos.x, o.windowPos.y, o.windowPos.z, o.windowPos.w);
+								//(resList + index)->setColor(o.color.x, o.color.y, o.color.z, o.color.w);
+								//(resList + index)->setNormal(o.normal.x, o.normal.y, o.normal.z);
+								//(resList + index)->setWorldpos(o.worldPos.x, o.worldPos.y, o.worldPos.z, o.worldPos.w);
+
+								//resList[index].y =j;
+								//resList[index].x = i; //= (raster_res(i, j, o));
+								//resList[index].o = o;
+								//resList[index].setTexture(o.texcoord.x, o.texcoord.y);
+								//resList[index].setWindowpos(o.windowPos.x, o.windowPos.y, o.windowPos.z, o.windowPos.w);
+								//resList[index].setColor(o.color.x, o.color.y, o.color.z, o.color.w);
+								//resList[index].setNormal(o.normal.x, o.normal.y, o.normal.z);
+								//resList[index].setWorldpos(o.worldPos.x, o.worldPos.y, o.worldPos.z, o.worldPos.w);
+								index++;
 								//resList[index] = raster_res(i, j, o);
 								//resList.push_back(raster_res(i, j, o));
+								//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
 							}
 							//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
 						}
@@ -203,7 +268,7 @@ namespace softRD
 			//cout <<o1.x<<" "<<o2.x<<" "<< x1 << " " << x2 << endl;
 		}
 
-		raster_res resList[480000];
+		raster_res resList[400000];
 	private:
 
 		RasterType type = RasterType::Fill;

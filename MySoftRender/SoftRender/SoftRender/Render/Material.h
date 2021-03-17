@@ -61,9 +61,6 @@ namespace softRD
 		{
 			for (int i = 0; i < stream.size(); i++)
 			{
-				//std::cout << stream[i]->v0().position.x << " " << stream[i]->v0().position.y << " " << stream[i]->v0().position.z << std::endl;
-				//std::cout << stream[i]->v1().position.x << " " << stream[i]->v1().position.y << " " << stream[i]->v1().position.z << std::endl;
-				//std::cout << stream[i]->v2().position.x << " " << stream[i]->v2().position.y << " " << stream[i]->v2().position.z << std::endl;
 				V2f o1 = shader->VertexShader(stream[i]->v0());
 				V2f o2 = shader->VertexShader(stream[i]->v1());
 				V2f o3 = shader->VertexShader(stream[i]->v2());
@@ -74,10 +71,10 @@ namespace softRD
 					//cout <<"vvvvvvvvv"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 					Global::raster->RasterTriangle(o1, o2, o3);
 					auto resList = Global::raster->resList;
-					for (size_t i = 0; i <100; i++)
+					for (size_t i = 0; i <Global::raster->index; i++)
 					{
-						//Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, shader->FragmentShader(resList[i].o));
-						Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, glm::vec4(1));
+						Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, shader->FragmentShader(resList[i].o));
+						//Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, glm::vec4(1));
 					}
 				}
 			}
