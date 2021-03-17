@@ -21,19 +21,34 @@ namespace softRD
 	{
 		return RasterType((int)a & (int)b);
 	}
+
+	struct raster_res
+	{
+	public:
+		raster_res() {}
+		raster_res(int _x, int _y,V2f* _o)
+		{
+			x = _x;
+			y = _y;
+			o = _o;
+		}
+		int x, y;
+		V2f* o;
+	};
 	class Rasterization
 	{
 	public:
-		Rasterization() {}
+		Rasterization() {  }
 		~Rasterization() {}
 
 		void SetRasterType(RasterType _type)
 		{
 			type = _type;
 		}
-
+		int index = 0;
 		void RasterTriangle(const V2f& o1, const V2f& o2, const V2f& o3)
 		{
+			index = 0;
 			if ((type & RasterType::Line) == RasterType::Line)
 			{
 				RasterLine(o1, o2);
@@ -68,25 +83,40 @@ namespace softRD
 						//cout << vec2(i, j) << endl;
 						if (centric.x > 0 && centric.y > 0 && centric.z > 0)
 						{
+							
+							//重心坐标可能会变，需要明天找解决办法(好像是变换回去，在进行一次中心坐标插值,还是不太懂
+							//glm::vec4 _color		= (o1.color * centric.x + o2.color * centric.y + o3.color * centric.z);
+							//glm::vec4 _windowpos	= (o1.windowPos * centric.x + o2.windowPos * centric.y + o3.windowPos * centric.z);
+							//glm::vec4 _worldPos		= (o1.worldPos * centric.x + o2.worldPos * centric.y + o3.worldPos * centric.z);
+							//glm::vec3 _normal		= (o1.normal * centric.x + o2.normal * centric.y + o3.normal * centric.z);
+							//glm::vec2 _texcoord		= (o1.texcoord * centric.x + o2.texcoord * centric.y + o3.texcoord * centric.z);
+							//float _z = (o1.Z * centric.x + o2.Z * centric.y + o3.Z * centric.z);
+
 							V2f o;
-							//重心坐标可能会变，需要明天找解决办法(好像是变换回去，在进行一次中心坐标插值,还是不太懂。。。。。
-							o = o1 * centric.x + o2 * centric.y + o3 * centric.z;
-							//o = o * (1/o.Z);
-							//float divZ = (1.0f / o.Z);
-							////cout << o.Z << endl;
-							//o.worldPos *= divZ;
-							//o.normal *= divZ;
-							//o.color *= divZ;
-							//o.texcoord *= divZ;
-							//std::cout << centric.x << " " << centric.y << " " << centric.z << std::endl;
+							o.color		= (o1.color * centric.x + o2.color * centric.y + o3.color * centric.z);
+							o.windowPos	= (o1.windowPos * centric.x + o2.windowPos * centric.y + o3.windowPos * centric.z);
+							o.worldPos	= (o1.worldPos * centric.x + o2.worldPos * centric.y + o3.worldPos * centric.z);
+							o.normal		= (o1.normal * centric.x + o2.normal * centric.y + o3.normal * centric.z);
+							o.texcoord	= (o1.texcoord * centric.x + o2.texcoord * centric.y + o3.texcoord * centric.z);
+							o.Z			= (o1.Z * centric.x + o2.Z * centric.y + o3.Z * centric.z);
+							//V2f o(o1 * centric.x + o2 * centric.y + o3 * centric.z);
+							//std::cout << o.texcoord.x << " " << o.texcoord.y << " ???????????" << std::endl;
 							//std::cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << std::endl;
 							//std::cout << o2.windowPos.x << " " << o2.windowPos.y << " " << o2.windowPos.z << " " << o2.windowPos.w << std::endl;
 							//std::cout << o3.windowPos.x << " " << o3.windowPos.y << " " << o3.windowPos.z << " " << o3.windowPos.w << std::endl;
 							//std::cout << o.windowPos.x << " " << o.windowPos.y << " " << o.windowPos.z << " " << o.windowPos.w << std::endl;
-							if (o.windowPos.z< std::numeric_limits<float>::infinity())
+							if (o.windowPos.z< Global::frameBuffer->GetDepth(i,j))
 							{
+								float divZ = (1.0f / o.Z);
+								//std::cout << o.Z << std::endl;
+								o.worldPos *= divZ;
+								o.normal *= divZ;
+								o.color *= divZ;
+								o.texcoord *= divZ;
 								Global::frameBuffer->WriteDepth(i, j, o.windowPos.z);
-								Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
+								*resList = raster_res(i, j, &o);
+								//resList[index] = raster_res(i, j, o);
+								//resList.push_back(raster_res(i, j, o));
 							}
 							//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
 						}
@@ -120,7 +150,7 @@ namespace softRD
 				for (int i = 0; i <= dx; ++i)
 				{
 					tmp = fMath::Lerp(from, to, ((float)(i) / dx));
-					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(1));
+					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(0,0.8,0,1));
 					currentX += xDelta;
 					if (P <= 0)
 						P += 2 * dy;
@@ -138,7 +168,7 @@ namespace softRD
 				for (int i = 0; i <= dy; ++i)
 				{
 					tmp = fMath::Lerp(from, to, ((float)(i) / dy));
-					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(1));
+					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(0, 0.8, 0, 1));
 					currentY += yDelta;
 					if (P <= 0)
 						P += 2 * dx;
@@ -173,8 +203,11 @@ namespace softRD
 			//cout <<o1.x<<" "<<o2.x<<" "<< x1 << " " << x2 << endl;
 		}
 
+		raster_res resList[480000];
 	private:
-		std::vector < std::function<int(int)>> hh;
+
 		RasterType type = RasterType::Fill;
 	};
+
+
 }

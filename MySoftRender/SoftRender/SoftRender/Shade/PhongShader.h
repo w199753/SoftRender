@@ -26,17 +26,20 @@ namespace softRD
 			//cout << modelMatrix << endl;
 			//cout << v.position << endl;
 			o.worldPos = modelMatrix * vertex.position;
-			
 			//cout << vertex.position.x<<" "<<vertex.position.y<<" "<<vertex.position.z << "        " << o.worldPos.x<<" "<< o.worldPos.y<<" "<< o.worldPos.z << endl;
 			//cout << o.worldPos<<">>>"<<v.position << endl;
 			o.windowPos = Global::mainCamera->projectMatrix * Global::mainCamera->viewMatrix * o.worldPos;
 			//cout << "??????????---------" << o.windowPos.x << " " << o.windowPos.y << " " << o.windowPos.z << " " << o.windowPos.w << endl;
+			o.normal = normalMat * vertex.normal;
+			o.texcoord = vertex.texcoord ;
+
 			return o;
 		}
 
 		glm::vec4 FragmentShader(const V2f& v2f)override
 		{
-			return glm::vec4();
+			return block.albedo->Sampler2D(v2f.texcoord);
+			return glm::vec4(0.2,0.5,0.8,1);
 		}
 
 		

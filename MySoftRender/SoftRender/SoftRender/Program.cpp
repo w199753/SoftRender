@@ -4,12 +4,13 @@
 #include<string>
 #include<thread>
 #include<algorithm>
-#include"stb_image.h"
+
 #include <iostream>
 #include <string.h>
 #include "Render/FrameBuffer.h"
 #include "Render/Object.h"
 #include"Shade/PhongShader.h"
+
 using namespace std;
 using namespace softRD;
 void processInput(GLFWwindow *window)
@@ -46,22 +47,20 @@ class AA
 {
 public:
 	int aaa;
-	AA() { cout << "cons aa" << endl;  }
+	AA() { data = make_unique<int>(); cout << "cons aa" << endl; }
 	AA(const AA& a)
 	{
-		cout << "aa" << endl;
+		AA bb;
+		//cout << "aa" << endl;
+		
 		aaa = a.aaa;
+		
 	}
-
-	AA& operator = (const AA& a)
-	{
-		cout << "bb" << endl;
-		return *this;
-	}
+	std::shared_ptr<int> data;
 };
 
 
-class BB:public AA
+class BB
 {
 public:
 	int bbb;
@@ -69,17 +68,7 @@ public:
 
 int main()
 {
-	glm::mat4x4 mm(1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4);
-	glm::mat4x4 xx(1, 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1);
-	mm = mm * xx;
-	for (size_t i = 0; i < 4; i++)
-	{
-		for (size_t j = 0; j < 4; j++)
-		{
-			std::cout << mm[i][j] << " ";
-		}
-		std::cout << std::endl;
-	}
+
 	//std::unique_ptr<Camera> main = ;
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, 800.f, 600.f);
@@ -92,12 +81,13 @@ int main()
 	Global::raster->SetRasterType(RasterType::Line| RasterType::Fill);
 
 	PropertyBlock block;
+	block.albedo = std::make_unique<Texture>("Model/textures/Albedo.png",TextureType::LDR);
 	std::unique_ptr<Shader> shader = std::make_unique<PhongShader>(block);
 	Material obj_material;
 	obj_material.SetShader(std::move(shader));
 	Object obj("Model/Test.obj",obj_material);
-	obj.SetScale(0.3, 0.3, 0.3);
-	obj.SetTranslate(0.4, 0.3, 0);
+	obj.SetScale(0.8, 0.8, 0.8);
+	obj.SetTranslate(0, 0, 0);
 
 	
 
