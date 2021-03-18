@@ -44,8 +44,9 @@ void softRD::FrameBuffer::WriteDepth(int x, int y, const float v)
 	{
 		return;
 	}
+	float* p = depthBuffer.data();
 	int xy = (y * width + x);
-	depthBuffer[xy] = v;
+	*(p + (y * width + x)) = v;
 }
 
 float softRD::FrameBuffer::GetDepth(int x, int y)
@@ -54,8 +55,9 @@ float softRD::FrameBuffer::GetDepth(int x, int y)
 	{
 		return std::numeric_limits<float>::infinity();
 	}
+	float* p = depthBuffer.data();
 	int xy = (y * width + x);
-	return depthBuffer[xy];
+	return *(p + (y * width + x));
 }
 
 glm::vec4 FrameBuffer::GetColor(int x, int y)

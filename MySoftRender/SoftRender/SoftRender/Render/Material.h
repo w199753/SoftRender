@@ -61,9 +61,9 @@ namespace softRD
 		{
 			for (int i = 0; i < stream.size(); i++)
 			{
-				V2f o1 = shader->VertexShader(stream[i]->v0());
+				V2f o1 = shader->VertexShader(stream[i]->v2());
 				V2f o2 = shader->VertexShader(stream[i]->v1());
-				V2f o3 = shader->VertexShader(stream[i]->v2());
+				V2f o3 = shader->VertexShader(stream[i]->v0());
 				//cout <<"xxxxxx"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 				if (PreRasterSetting(o1,o2,o3))
 				{
@@ -104,13 +104,14 @@ namespace softRD
 
 		void PerspectiveDivision(V2f& v) {
 			//cout << v.windowPos.z << " " << v.windowPos.w << endl;
+			v.Z = 1.f / v.windowPos.w;
 			v.windowPos /= v.windowPos.w;
 			v.windowPos.w = 1.0f;
 			// OpenGL的Z-Buffer是 [0,1]，而透视除法之后Z除了深度测试已经没用了
 			v.windowPos.z = (v.windowPos.z + 1.0) * 0.5;
 
 			//--透视矫正插值:使用w还是使用z关系不大，因为可以推出用1/z做矫正，z和w为线性关系，后来业界统一为用w
-			v.Z = 1.f / v.windowPos.w;
+			
 			v.normal *= v.Z;
 			v.color *= v.Z;
 			v.texcoord *= v.Z;

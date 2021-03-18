@@ -62,34 +62,23 @@ namespace softRD
 
 			}
 
-			if (channel == 1)
+			if (channel>=1)
 			{
 				res.x = *(p + xy);
-				res.y = 0;
-				res.z = 0;
-				res.w = 0;
 			}
-			else if (channel == 2)
+			if (channel >= 2)
 			{
-				res.x = *(p + xy);
 				res.y = *(p + xy + 1);
-				res.z = 0;
-				res.w = 0;
 			}
-			else if (channel == 3)
+			if (channel >= 3)
 			{
-				res.x = *(p + xy);
-				res.y = *(p + xy + 1);
 				res.z = *(p + xy + 2);
-				res.w = 0;
 			}
-			else if (channel == 4)
+			if (channel >= 4)
 			{
-				res.x = *(p + xy);
-				res.y = *(p + xy + 1);
-				res.z = *(p + xy + 2);
 				res.w = *(p + xy + 3);
 			}
+
 			//std::cout << res.x << " " << res.y << " " << res.z << " " << channel<<" "<<uv.x<<" "<<uv.y << std::endl;
 			return res;
 		}

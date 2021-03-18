@@ -78,16 +78,25 @@ int main()
 	Global::frameBuffer = std::make_unique<FrameBuffer>(800, 600);
 
 	Global::raster = std::make_unique<Rasterization>();
-	Global::raster->SetRasterType(RasterType::Line| RasterType::Fill);
+	Global::raster->SetRasterType(RasterType::Fill);
 
 	PropertyBlock block;
 	block.albedo = std::make_unique<Texture>("Model/textures/Albedo.png",TextureType::LDR);
 	std::unique_ptr<Shader> shader = std::make_unique<PhongShader>(block);
 	Material obj_material;
 	obj_material.SetShader(std::move(shader));
-	Object obj("Model/Test.obj",obj_material);
-	obj.SetScale(1.3, 1.3, 0.8);
-	obj.SetTranslate(0, 0, 0);
+	//Object obj("Model/cube_1.obj",obj_material);
+	//obj.SetScale(0.8, 0.8, 0.3);
+	//obj.SetRotate(0, 10, 0);
+	//obj.SetTranslate(-0.5, -12.8, 25);
+	//Object obj("Model/face.obj", obj_material);
+	//obj.SetScale(1., 1., 1);
+	//obj.SetRotate(0, 10, 0);
+	//obj.SetTranslate(0, -0.5, -3);
+	Object obj("Model/Scanner.obj",obj_material);
+	obj.SetScale(0.0004, 0.0004, 0.0004);
+	obj.SetRotate(0, 40, 0);
+	obj.SetTranslate(0, -0.5, -0.5);
 
 	//PropertyBlock block1;
 	//block1.albedo = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR);

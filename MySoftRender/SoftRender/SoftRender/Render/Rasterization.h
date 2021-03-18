@@ -22,7 +22,7 @@ namespace softRD
 		return RasterType((int)a & (int)b);
 	}
 
-	class raster_res
+	struct raster_res
 	{
 	public:
 		raster_res() {}
@@ -32,55 +32,50 @@ namespace softRD
 			y = _y;
 			o = _o;
 		}
-		inline void setWindowpos(float x, float y, float z, float w)
-		{
-			//o.windowPos.x = x;
-			//o.windowPos.y = y;
-			//o.windowPos.z = z;
-			//o.windowPos.w = w;
-			o.windowPos = glm::vec4(x,y,z,w);
-		}
+		//inline void setWindowpos(float x, float y, float z, float w)
+		//{
+		//	//o.windowPos.x = x;
+		//	//o.windowPos.y = y;
+		//	//o.windowPos.z = z;
+		//	//o.windowPos.w = w;
+		//	o.windowPos = glm::vec4(x,y,z,w);
+		//}
 
-		inline void setTexture(float x, float y)
-		{
-			o.texcoord = glm::vec2(x,y);
-			//o.texcoord.x = x;
-			//o.texcoord.y = y;
-		}
+		//inline void setTexture(float x, float y)
+		//{
+		//	o.texcoord = glm::vec2(x,y);
+		//	//o.texcoord.x = x;
+		//	//o.texcoord.y = y;
+		//}
 
-		inline void setWorldpos(float x, float y, float z, float w)
-		{
-			o.worldPos = glm::vec4(x,y,z,w);
-			//o.worldPos.x = x;
-			//o.worldPos.y = y;
-			//o.worldPos.z = z;
-			//o.worldPos.w = w;
-		}
+		//inline void setWorldpos(float x, float y, float z, float w)
+		//{
+		//	o.worldPos = glm::vec4(x,y,z,w);
+		//	//o.worldPos.x = x;
+		//	//o.worldPos.y = y;
+		//	//o.worldPos.z = z;
+		//	//o.worldPos.w = w;
+		//}
 
-		inline void setNormal(float x, float y, float z)
-		{
-			o.normal = glm::vec3(x,y,z);
-			//o.normal.x = x;
-			//o.normal.y = y;
-			//o.normal.z = z;
-		}
+		//inline void setNormal(float x, float y, float z)
+		//{
+		//	o.normal = glm::vec3(x,y,z);
+		//	//o.normal.x = x;
+		//	//o.normal.y = y;
+		//	//o.normal.z = z;
+		//}
 
-		inline void setColor(float x, float y, float z,float w)
-		{
-			o.color = glm::vec4(x,y,z,w);
-			//o.color.x = x;
-			//o.color.y = y;
-			//o.color.z = z;
-			//o.color.w = w;
-		}
-		int x, y;
+		//inline void setColor(float x, float y, float z,float w)
+		//{
+		//	o.color = glm::vec4(x,y,z,w);
+		//	//o.color.x = x;
+		//	//o.color.y = y;
+		//	//o.color.z = z;
+		//	//o.color.w = w;
+		//}
+		int x=0, y=0;
 		V2f o;
-		glm::vec4 worldPos;
-		glm::vec4 windowPos;
-		glm::vec4 color;
-		glm::vec3 normal;
-		glm::vec2 texcoord;
-		float Z;
+
 	};
 	class Rasterization
 	{
@@ -146,12 +141,14 @@ namespace softRD
 							o.normal		= (o1.normal * centric.x + o2.normal * centric.y + o3.normal * centric.z);
 							o.texcoord	= (o1.texcoord * centric.x + o2.texcoord * centric.y + o3.texcoord * centric.z);
 							o.Z			= (o1.Z * centric.x + o2.Z * centric.y + o3.Z * centric.z);
+
 							//V2f o(o1 * centric.x + o2 * centric.y + o3 * centric.z);
 							//std::cout << o.texcoord.x << " " << o.texcoord.y << " ???????????" << std::endl;
 							//std::cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << std::endl;
 							//std::cout << o2.windowPos.x << " " << o2.windowPos.y << " " << o2.windowPos.z << " " << o2.windowPos.w << std::endl;
 							//std::cout << o3.windowPos.x << " " << o3.windowPos.y << " " << o3.windowPos.z << " " << o3.windowPos.w << std::endl;
 							//std::cout << o.windowPos.x << " " << o.windowPos.y << " " << o.windowPos.z << " " << o.windowPos.w << std::endl;
+							//std::cout << o.windowPos.z << " " << Global::frameBuffer->GetDepth(i, j) << std::endl;
 							if (o.windowPos.z< Global::frameBuffer->GetDepth(i,j))
 							{
 								float divZ = (1.0f / o.Z);

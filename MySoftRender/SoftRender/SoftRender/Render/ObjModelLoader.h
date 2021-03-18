@@ -84,8 +84,8 @@ namespace softRD
 							iss >> v[i][0] >> trash >> v[i][1];
 							vert.position = glm::vec4(position[v[i][0]-1], 1);
 							vert.texcoord = texcoord[v[i][1]-1];
-							mesh.PushVertex(vert);
 							mesh.PushIndices(mesh.getVectorVerticesSize());
+							mesh.PushVertex(vert);
 						}
 						if (iss >> v[3][0])
 						{
@@ -93,18 +93,18 @@ namespace softRD
 							Vertex vert1;
 							vert1.position = glm::vec4(position[v[0][0]-1], 1);
 							vert1.texcoord = texcoord[v[0][1]-1];
-							mesh.PushVertex(vert1);
 							mesh.PushIndices(mesh.getVectorVerticesSize());
+							mesh.PushVertex(vert1);
 							Vertex vert2;
 							vert2.position = glm::vec4(position[v[2][0]-1], 1);
 							vert2.texcoord = texcoord[v[2][1]-1];
-							mesh.PushVertex(vert2);
 							mesh.PushIndices(mesh.getVectorVerticesSize());
+							mesh.PushVertex(vert2);
 							Vertex vert3;
 							vert3.position = glm::vec4(position[v[3][0]-1], 1);
 							vert3.texcoord = texcoord[v[3][1]-1];
-							mesh.PushVertex(vert3);
 							mesh.PushIndices(mesh.getVectorVerticesSize());
+							mesh.PushVertex(vert3);
 						}
 					}
 					else
@@ -116,8 +116,8 @@ namespace softRD
 							vert.position = glm::vec4(position[v[i][0]-1], 1);
 							vert.texcoord = texcoord[v[i][1]-1];
 							vert.normal = normal[v[i][2]-1];
-							mesh.PushVertex(vert);
 							mesh.PushIndices(mesh.getVectorVerticesSize());
+							mesh.PushVertex(vert);
 						}
 						if (iss >> v[3][0])
 						{
@@ -126,20 +126,20 @@ namespace softRD
 							vert1.position = glm::vec4(position[v[0][0]-1], 1);
 							vert1.texcoord = texcoord[v[0][1]-1];
 							vert1.normal = normal[v[0][2]-1];
-							mesh.PushVertex(vert1);
 							mesh.PushIndices(mesh.getVectorVerticesSize());
+							mesh.PushVertex(vert1);
 							Vertex vert2;
 							vert2.position = glm::vec4(position[v[2][0]-1], 1);
 							vert2.texcoord = texcoord[v[2][1]-1];
 							vert1.normal = normal[v[2][2]-1];
-							mesh.PushVertex(vert2);
 							mesh.PushIndices(mesh.getVectorVerticesSize());
+							mesh.PushVertex(vert2);
 							Vertex vert3;
 							vert3.position = glm::vec4(position[v[3][0]-1], 1);
 							vert3.texcoord = texcoord[v[3][1]-1];
 							vert1.normal = normal[v[3][2]-1];
-							mesh.PushVertex(vert3);
 							mesh.PushIndices(mesh.getVectorVerticesSize());
+							mesh.PushVertex(vert3);
 						}
 					}
 

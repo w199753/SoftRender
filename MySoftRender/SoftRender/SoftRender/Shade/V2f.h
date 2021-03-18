@@ -12,13 +12,21 @@ namespace softRD
 		glm::vec2 texcoord;
 		float Z;
 		V2f() {
-			worldPos = glm::vec4(0);
-			windowPos = glm::vec4(0);
-			color = glm::vec4(0);
-			normal = glm::vec3(0);
-			texcoord = glm::vec2(0);
+			worldPos	= glm::vec4(0);
+			windowPos	= glm::vec4(0);
+			color		= glm::vec4(0);
+			normal		= glm::vec3(0);
+			texcoord	= glm::vec2(0);
 			Z = 0;
 		}
+		V2f(const glm::vec4& _worldPos,
+			const glm::vec4& _windowPos ,
+			const glm::vec4& _color ,
+			const glm::vec3& _normal ,
+			const glm::vec2& _texcoord,
+			float _z = 1.0f) :
+			worldPos(_worldPos), windowPos(_windowPos), color(_color), normal(_normal), texcoord(_texcoord), Z(_z) {}
+
 		~V2f() {}
 
 		//V2f(const V2f& v2f)
@@ -59,26 +67,12 @@ namespace softRD
 
 		V2f operator*(const float p)const
 		{
-			V2f o;
-			o.worldPos = worldPos * p;
-			o.windowPos = windowPos * p;
-			o.normal = p * normal;
-			o.color = p * color;
-			o.texcoord = p * texcoord;
-			o.Z = p * Z;
-			return o;
+			return V2f(worldPos*p,windowPos*p,color*p,normal*p,texcoord*p,Z*p);
 		}
 
 		V2f operator+(const V2f& v2f) const
 		{
-			V2f res;
-			res.worldPos = worldPos + v2f.worldPos;
-			res.windowPos = windowPos + v2f.windowPos;
-			res.color = color + v2f.color;
-			res.normal = normal + v2f.normal;
-			res.texcoord = texcoord + v2f.texcoord;
-			res.Z = Z + v2f.Z;
-			return res;
+			return V2f(worldPos + v2f.worldPos, windowPos +v2f.windowPos, color +v2f.color, normal +v2f.normal, texcoord +v2f.texcoord, Z +v2f.Z);
 		}
 
 

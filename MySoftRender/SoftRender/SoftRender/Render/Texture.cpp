@@ -11,10 +11,13 @@ softRD::Texture::Texture(const std::string& path, TextureType _txtType) {
 	txtType = _txtType;
 	if (txtType == TextureType::LDR)
 	{
+		
+		stbi_set_flip_vertically_on_load(true);
 		data = stbi_load(path.c_str(), &width, &height, &channel, 0);
 	}
 	else if (txtType == TextureType::HDR)
 	{
+		stbi_set_flip_vertically_on_load(true);
 		fData = stbi_loadf(path.c_str(), &width, &height, &channel, 0);
 	}
 
@@ -94,15 +97,16 @@ glm::vec4 softRD::Texture::Sampler2D(const glm::vec2& uv)
 	glm::vec4 res = glm::vec4(0);
 	unsigned char* p;
 	float* fp;
+	float Div255 = 1.f / 255.f;
 	if (txtType == TextureType::LDR)
 	{
 		p = data;
-		return internal_Sampler2D(uv, res, p);
+		return internal_Sampler2D(uv, res, p)* Div255;
 	}
 	else if (txtType == TextureType::HDR)
 	{
 		fp = fData;
-		return internal_Sampler2D(uv, res, fp);
+		return internal_Sampler2D(uv, res, fp)* Div255;
 	}
 	p = nullptr;
 	fp = nullptr;
