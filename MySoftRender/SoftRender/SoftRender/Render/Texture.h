@@ -1,5 +1,6 @@
 #pragma once
 #include<iostream>
+#include<vector>
 #include<glm/vector_relational.hpp>
 #include<glm/glm.hpp>
 #include<glm/common.hpp>
@@ -25,7 +26,7 @@ namespace softRD
 	{
 	public:
 		Texture();
-		Texture(const std::string& path, TextureType _txtType);
+		Texture(const std::string& path, TextureType _txtType,bool isGenMipmap = false);
 
 		Texture::Texture(const Texture& t);
 
@@ -87,6 +88,7 @@ namespace softRD
 
 		int width, height;
 		int channel;
+		bool isGenMipmap = false;
 		bool gammaCorrect = false;
 		unsigned char* data;
 		float* fData;
@@ -95,7 +97,11 @@ namespace softRD
 		WrapType wrapType = WrapType::Clamp;
 
 	private:
+		std::vector<std::unique_ptr<Texture>> mipmapData;
+		void GenMipmap()
+		{
 
+		}
 	};
 
 }

@@ -6,12 +6,11 @@ softRD::Texture::Texture()
 {
 }
 
-softRD::Texture::Texture(const std::string& path, TextureType _txtType) {
-
+softRD::Texture::Texture(const std::string& path, TextureType _txtType, bool _isGenMipmap) {
+	isGenMipmap = _isGenMipmap;
 	txtType = _txtType;
 	if (txtType == TextureType::LDR)
 	{
-		
 		stbi_set_flip_vertically_on_load(true);
 		data = stbi_load(path.c_str(), &width, &height, &channel, 0);
 	}
@@ -19,6 +18,62 @@ softRD::Texture::Texture(const std::string& path, TextureType _txtType) {
 	{
 		stbi_set_flip_vertically_on_load(true);
 		fData = stbi_loadf(path.c_str(), &width, &height, &channel, 0);
+	}
+
+	if (isGenMipmap)
+	{
+		int level = 0;
+		int maxLength = std::max(width, height);
+		auto srcData = data;
+
+		auto baseMap = std::make_unique<Texture>();
+		baseMap->channel = channel;
+		baseMap->width = width;
+		baseMap->height = height;
+		baseMap->wrapType = wrapType;
+		baseMap->filterType = filterType;
+		baseMap->gammaCorrect = gammaCorrect;
+		baseMap->isGenMipmap = false;
+		baseMap->data = new unsigned char[width * height * channel];
+		std::copy(baseMap->data, baseMap->data + width * height * channel, data);
+		mipmapData.push_back(std::move(baseMap));
+		level++;
+
+		for (size_t i = maxLength >> 1; i > 0; i >>= 1)
+		{
+			std::cout << i << std::endl;
+			auto mip = std::make_unique<Texture>();
+			mip->channel = channel;
+			mip->width = i;
+			mip->height = i;
+			mip->wrapType = wrapType;
+			mip->filterType = filterType;
+			mip->gammaCorrect = gammaCorrect;
+			mip->isGenMipmap = false;
+
+			unsigned char* tarData = new unsigned char[i * i * channel];
+			int xIdx = 0, yIdx = 0;
+			int lastWidth = mipmapData[level - 1]->width;
+			unsigned char* lastData = mipmapData[level - 1]->data;
+			for (size_t y = 0; y < i; y += 2)
+			{
+				for (size_t x = 0; x <= i; x += 2)
+				{
+					int xy1 = (y * lastWidth + x) * channel;
+					int xy2 = (y * lastWidth + x + 1) * channel;
+					int xy3 = ((y + 1) * lastWidth + x) * channel;
+					int xy4 = ((y + 1) * lastWidth + x + 1) * channel;
+					for (size_t c = 0; c < channel; c++)
+					{
+						int tarIdx = yIdx * mip->width + xIdx;
+						//*(tarData)
+					}
+				}
+			}
+
+			//mipmapData.push_back()
+		}
+
 	}
 
 }
@@ -101,12 +156,12 @@ glm::vec4 softRD::Texture::Sampler2D(const glm::vec2& uv)
 	if (txtType == TextureType::LDR)
 	{
 		p = data;
-		return internal_Sampler2D(uv, res, p)* Div255;
+		return internal_Sampler2D(uv, res, p) * Div255;
 	}
 	else if (txtType == TextureType::HDR)
 	{
 		fp = fData;
-		return internal_Sampler2D(uv, res, fp)* Div255;
+		return internal_Sampler2D(uv, res, fp) * Div255;
 	}
 	p = nullptr;
 	fp = nullptr;
