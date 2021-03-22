@@ -81,7 +81,9 @@ int main()
 	Global::raster->SetRasterType(RasterType::Fill);
 
 	PropertyBlock block;
-	block.albedo = std::make_unique<Texture>("Model/textures/Albedo.png",TextureType::LDR);
+	auto txt = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR, true);
+	txt->filterType = FilterType::Bilinear;
+	block.albedo = std::move(txt);
 	std::unique_ptr<Shader> shader = std::make_unique<PhongShader>(block);
 	Material obj_material;
 	obj_material.SetShader(std::move(shader));
@@ -95,8 +97,8 @@ int main()
 	//obj.SetTranslate(0, -0.5, -3);
 	Object obj("Model/Scanner.obj",obj_material);
 	obj.SetScale(0.0004, 0.0004, 0.0004);
-	obj.SetRotate(0, 40, 0);
-	obj.SetTranslate(0, -0.5, -0.5);
+	obj.SetRotate(0, 90, 0);
+	obj.SetTranslate(0, -0.5, -0.0);
 
 	//PropertyBlock block1;
 	//block1.albedo = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR);

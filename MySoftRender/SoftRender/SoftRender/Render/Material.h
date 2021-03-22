@@ -24,7 +24,7 @@ namespace softRD
 	public:
 		int sortingOrder = 0;
 		Material() {}
-		Material(ShadingType _type,int _sortingOrder = 0)
+		Material(ShadingType _type, int _sortingOrder = 0)
 		{
 			type = _type;
 			sortingOrder = _sortingOrder;
@@ -43,7 +43,7 @@ namespace softRD
 			default:
 				break;
 			}
-			
+
 		}
 		~Material() {}
 
@@ -55,26 +55,34 @@ namespace softRD
 		void SetShader(std::unique_ptr<Shader> _shader)
 		{
 			shader = std::move(_shader);
+			//shader->AddPass();
+			//shader->AddPass(shader->VertexShader(),)
 		}
 
 		void Render(std::vector<Triangle*> stream)
 		{
 			for (int i = 0; i < stream.size(); i++)
 			{
-				V2f o1 = shader->VertexShader(stream[i]->v2());
-				V2f o2 = shader->VertexShader(stream[i]->v1());
-				V2f o3 = shader->VertexShader(stream[i]->v0());
-				//cout <<"xxxxxx"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
-				if (PreRasterSetting(o1,o2,o3))
+				for (size_t s = 0; s < shader->pass.size(); s++)
 				{
-					//cout << "***********" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
-					//cout <<"vvvvvvvvv"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
-					Global::raster->RasterTriangle(o1, o2, o3);
-					auto resList = Global::raster->resList;
-					for (size_t i = 0; i <Global::raster->index; i++)
+					V2f o1 = shader->pass[s].vertexShader(stream[i]->v2());
+					V2f o2 = shader->pass[s].vertexShader(stream[i]->v1());
+					V2f o3 = shader->pass[s].vertexShader(stream[i]->v0());
+					//cout <<"xxxxxx"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
+					if (PreRasterSetting(o1, o2, o3))
 					{
-						Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, shader->FragmentShader(resList[i].o));
+						//cout << "***********" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
+						//cout <<"vvvvvvvvv"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
+						Global::raster->RasterTriangle(o1, o2, o3);
+
+						auto resList = Global::raster->resList;
+						for (size_t i = 0; i < Global::raster->index; i++)
+						{
+							Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, shader->pass[s].fragmentShader(resList[i].o));
+							//Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, shader->FragmentShader(resList[i].o));
+
 						//Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, glm::vec4(1));
+						}
 					}
 				}
 			}
@@ -84,14 +92,14 @@ namespace softRD
 		ShadingType type = ShadingType::Phong;
 		CullSystem cull;
 
-		bool PreRasterSetting(V2f& o1,V2f& o2,V2f& o3)
+		bool PreRasterSetting(V2f& o1, V2f& o2, V2f& o3)
 		{
 			PerspectiveDivision(o1);
 			PerspectiveDivision(o2);
 			PerspectiveDivision(o3);
 
 			//cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << endl;
-			if (cull.FaceCull(false,o1,o2,o3))
+			if (cull.FaceCull(false, o1, o2, o3))
 			{
 				return false;
 			}
@@ -111,7 +119,7 @@ namespace softRD
 			v.windowPos.z = (v.windowPos.z + 1.0) * 0.5;
 
 			//--透视矫正插值:使用w还是使用z关系不大，因为可以推出用1/z做矫正，z和w为线性关系，后来业界统一为用w
-			
+
 			v.normal *= v.Z;
 			v.color *= v.Z;
 			v.texcoord *= v.Z;
