@@ -13,10 +13,116 @@
 
 using namespace std;
 using namespace softRD;
-void processInput(GLFWwindow *window)
+
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
+glm::vec3 pos = glm::vec3(0, 0, 1);
+glm::vec3 look = glm::vec3(0, 0, -1);
+glm::vec3 rot = glm::vec3(0, 0, 0);
+bool addDelta = false;
+float delta = 0.5f;
+bool isDragView = false;
+double startx = 0;
+double starty = 0;
+int fps = 0;
+int vertCount = 0;
+int traCount = 0;
+//button:0左键，1右键，2中
+//Action：1按下 0释放
+//Mode:没用到不知道
+static void mouse_btn_callback(GLFWwindow* pWindow, int Button, int Action, int Mode)
+{
+	if (Button == 1)
+	{
+		isDragView = Action == 1 ? true : false;
+		if (isDragView)
+		{
+			//https://blog.csdn.net/qq_40239482/article/details/105834521
+			glfwGetCursorPos(pWindow, &startx, &starty);
+			starty = SCR_HEIGHT - starty;
+			startx = startx - SCR_WIDTH;
+			starty = starty - SCR_HEIGHT;
+			//startx
+		}
+	}
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	ypos = SCR_HEIGHT - ypos;
+	xpos = xpos - SCR_WIDTH;
+	ypos = ypos - SCR_HEIGHT;
+	if (isDragView)
+	{
+		//std::cout << xpos << " " << ypos << std::endl;
+		//glm::vec3 r = glm::normalize(glm::vec3(xpos - startx, ( starty- ypos), 0));
+		//std::cout << r.x << " " << r.y << std::endl;
+		//Global::mainCamera->SetRotate(glm::vec3(r.y, r.x,0));
+	}
+}
+
+void scroll_callback(GLFWwindow* window, double xoffeset, double yoffset)
+{
+	pos.z -= yoffset * 0.5;
+	Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+}
+
+void processInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		addDelta = true;
+		pos.x -= 0.02 * delta;
+		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		addDelta = true;
+		pos.x += 0.02 * delta;
+		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+	}
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		addDelta = true;
+		pos.z -= 0.02 * delta;
+		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		addDelta = true;
+		pos.z += 0.02 * delta;
+		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		addDelta = true;
+		pos.y -= 0.02 * delta;
+		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		addDelta = true;
+		pos.y += 0.02 * delta;
+		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE &&
+		glfwGetKey(window, GLFW_KEY_Q) == GLFW_RELEASE &&
+		glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE &&
+		glfwGetKey(window, GLFW_KEY_S) == GLFW_RELEASE &&
+		glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE &&
+		glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE)
+	{
+		addDelta = false;
+		delta = 0.5;
+	}
+	if (addDelta)
+	{
+		delta += 0.05;
+	}
 }
 
 
@@ -25,7 +131,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-int fps = 0;
+
 void showfps(GLFWwindow* window)
 {
 	while (1)
@@ -33,13 +139,11 @@ void showfps(GLFWwindow* window)
 		Sleep(1000);
 		string txt = "FPS:" + std::to_string(fps);
 		glfwSetWindowTitle(window, txt.c_str());
+
 		fps = 0;
 	}
 
 }
-// settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
 
 using namespace std;
 
@@ -52,9 +156,9 @@ public:
 	{
 		AA bb;
 		//cout << "aa" << endl;
-		
+
 		aaa = a.aaa;
-		
+
 	}
 	std::shared_ptr<int> data;
 };
@@ -71,11 +175,11 @@ int main()
 
 	//std::unique_ptr<Camera> main = ;
 	Global::mainCamera = std::make_unique<Camera>();
-	Global::mainCamera->SetViewportParams(0, 0, 800.f, 600.f);
-	Global::mainCamera->SetTransformParam(glm::vec3(0,0,1), glm::vec3(0, 0, 1)+ glm::vec3(0, 0, -1), glm::vec3(0));
-	Global::mainCamera->SetProjectParams(1.f, 100.f, 60.f, 800.f / 600.f);
+	Global::mainCamera->SetViewportParams(0, 0, static_cast<float>(SCR_WIDTH), static_cast<float>(SCR_HEIGHT));
+	Global::mainCamera->SetTransformParam(pos, pos + look, glm::vec3(0));
+	Global::mainCamera->SetProjectParams(1.f, 100.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
 
-	Global::frameBuffer = std::make_unique<FrameBuffer>(800, 600);
+	Global::frameBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
 
 	Global::raster = std::make_unique<Rasterization>();
 	Global::raster->SetRasterType(RasterType::Fill);
@@ -90,15 +194,15 @@ int main()
 	//Object obj("Model/cube_1.obj",obj_material);
 	//obj.SetScale(0.8, 0.8, 0.3);
 	//obj.SetRotate(0, 10, 0);
-	//obj.SetTranslate(-0.5, -12.8, 25);
+	//obj.SetTranslate(0, -25, -25);
 	//Object obj("Model/face.obj", obj_material);
 	//obj.SetScale(1., 1., 1);
 	//obj.SetRotate(0, 10, 0);
 	//obj.SetTranslate(0, -0.5, -3);
-	Object obj("Model/Scanner.obj",obj_material);
+	Object obj("Model/Scanner.obj", obj_material);
 	obj.SetScale(0.0004, 0.0004, 0.0004);
 	obj.SetRotate(0, 90, 0);
-	obj.SetTranslate(0, -0.5, -0.0);
+	obj.SetTranslate(0, -0.5, 0.0);
 
 	//PropertyBlock block1;
 	//block1.albedo = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR);
@@ -109,7 +213,7 @@ int main()
 	//obj1.SetScale(1, 1, 0.9);
 	//obj1.SetTranslate(0.5, 0, 0);
 
-	
+
 
 	//Test* tt = new Test();
 	//change(tt,200);
@@ -139,7 +243,11 @@ int main()
 		return -1;
 	}
 
+	glfwSetScrollCallback(window, scroll_callback);
 
+	glfwSetMouseButtonCallback(window, mouse_btn_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
+	
 	std::thread showFPS(showfps, window);
 	showFPS.detach();
 	while (!glfwWindowShouldClose(window))

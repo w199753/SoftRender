@@ -61,6 +61,8 @@ namespace softRD
 
 		void Render(std::vector<Triangle*> stream)
 		{
+			Global::verticesCount = 0;
+			Global::triangleCount = 0;
 			for (int i = 0; i < stream.size(); i++)
 			{
 				for (size_t s = 0; s < shader->pass.size(); s++)
@@ -74,7 +76,8 @@ namespace softRD
 						//cout << "***********" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 						//cout <<"vvvvvvvvv"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 						Global::raster->RasterTriangle(o1, o2, o3);
-
+						Global::verticesCount +=3/shader->pass.size();
+						Global::triangleCount +=1/shader->pass.size();
 						auto resList = Global::raster->resList;
 						for (size_t i = 0; i < Global::raster->index; i++)
 						{
@@ -94,15 +97,18 @@ namespace softRD
 
 		bool PreRasterSetting(V2f& o1, V2f& o2, V2f& o3)
 		{
+
+			//cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << endl;
+
 			PerspectiveDivision(o1);
 			PerspectiveDivision(o2);
 			PerspectiveDivision(o3);
 
-			//cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << endl;
 			if (cull.FaceCull(false, o1, o2, o3))
 			{
 				return false;
 			}
+
 			//�ӿڱ任
 			o1.windowPos = Global::mainCamera->viewportMatrix * o1.windowPos;
 			o2.windowPos = Global::mainCamera->viewportMatrix * o2.windowPos;

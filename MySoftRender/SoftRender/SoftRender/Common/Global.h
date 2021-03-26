@@ -18,6 +18,8 @@ namespace softRD
 		static std::unique_ptr<Rasterization> raster;
 		static std::unique_ptr<Camera> mainCamera;
 		static std::unique_ptr<FrameBuffer> frameBuffer;
+		static float triangleCount;
+		static float verticesCount;
 	};
 
 }

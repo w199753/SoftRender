@@ -12,6 +12,8 @@ using namespace softRD;
 std::unique_ptr<Camera> Global::mainCamera = nullptr;
 std::unique_ptr<Rasterization> Global::raster = nullptr;
 std::unique_ptr<FrameBuffer> Global::frameBuffer = nullptr;
+float Global::triangleCount = 0;
+float Global::verticesCount = 0;
 //void Global::SetMainCamera(std::unique_ptr<Camera>_main)
 //{
 //	mainCamera = std::move(_main);

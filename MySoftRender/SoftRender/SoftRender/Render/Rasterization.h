@@ -82,6 +82,7 @@ namespace softRD
 	public:
 		Rasterization() {  }
 		~Rasterization() {}
+		
 
 		void SetRasterType(RasterType _type)
 		{
@@ -248,7 +249,7 @@ namespace softRD
 			glm::vec3 p(x, y, 0);
 			auto a = glm::cross((p - v1), (v2 - v1));
 			auto b = glm::cross((p - v2), (v3 - v2));
-			auto c = glm::cross((p - v2), (v1 - v3));
+			auto c = glm::cross((p - v3), (v1 - v3));
 			if ((a.z > 0 && b.z > 0 && c.z) || (a.z < 0 && b.z < 0 && c.z < 0))
 				return true;
 			return
