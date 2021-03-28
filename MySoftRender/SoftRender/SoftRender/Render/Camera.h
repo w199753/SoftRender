@@ -70,7 +70,7 @@ namespace softRD
 		void SetTransformParam(const glm::vec3& pos, const glm::vec3& lookat, const glm::vec3& eulerAngle)
 		{
 			position = pos;
-			forward = glm::normalize(lookat - pos);  //规定相机看向z的负半轴
+			forward = glm::normalize(lookat- pos);  //规定相机看向z的负半轴
 			//std::cout << forward.x << " " << forward.y << " " << forward.z << std::endl;
 			right = glm::normalize(glm::cross(forward, worldUpDir));
 			up = glm::normalize(glm::cross(right, forward));
@@ -103,23 +103,26 @@ namespace softRD
 			//viewMatrix = glm::transpose(viewMatrix);
 		}
 
-		void SetRotate(const glm::vec3 angle)
+		inline void MoveHorizontal(const float x)
 		{
-			pitch += angle.x;
-			if (pitch > 89.0)
-				pitch = 89.0;
-			if (pitch < -89.0)
-				pitch = -89.0;
-			yaw += angle.y;
-			if (yaw > 360)
-				yaw = 0;
-			if (yaw < 0)
-				yaw = 360;
-			
-			glm::vec3 _front = Euler2Dir(glm::vec3(pitch, yaw, 0.0f));
+			position += x*this->right;
+			updateMatrix();
+		}
+		inline void MoveVertical(const float y)
+		{
+			position += y * this->up;
+			updateMatrix();
+		}
+		inline void MoveForward(const float z)
+		{
+			position += z * this->forward;
+			updateMatrix();
+		}
 
+		void updateMatrix()
+		{
+			glm::vec3 _front = Euler2Dir(glm::vec3(pitch, yaw, 0.0f));
 			forward = glm::normalize(_front);  //规定相机看向z的负半轴
-//std::cout << forward.x << " " << forward.y << " " << forward.z << std::endl;
 			right = glm::normalize(glm::cross(forward, worldUpDir));
 			up = glm::normalize(glm::cross(right, forward));
 			viewMatrix[0][0] = right.x;
@@ -134,6 +137,21 @@ namespace softRD
 			viewMatrix[3][0] = -glm::dot(position, right);
 			viewMatrix[3][1] = -glm::dot(position, up);
 			viewMatrix[3][2] = glm::dot(position, forward);
+		}
+
+		void SetRotate(const glm::vec3 angle)
+		{
+			pitch += angle.x;
+			if (pitch > 89.0)
+				pitch = 89.0;
+			if (pitch < -89.0)
+				pitch = -89.0;
+			yaw += angle.y;
+			if (yaw > 360)
+				yaw = 0;
+			if (yaw < 0)
+				yaw = 360;
+			updateMatrix();
 		}
 
 		glm::vec3 Euler2Dir(const glm::vec3& fromEuler) {
@@ -162,13 +180,15 @@ namespace softRD
 		glm::mat4x4 projectMatrix = glm::mat4x4(0);
 		glm::mat4x4 viewportMatrix = glm::mat4x4(1);
 		glm::vec3 up = glm::vec3(0), right = glm::vec3(0), forward = glm::vec3(0), position = glm::vec3(0);
-	private:
-		glm::vec3 const worldUpDir = glm::vec3(0, 1, 0);
+	
 
 		//透视投影所需参数
 		float Near, Far, fov, aspect;    //这里fov为纵向，aspect为宽高比
 		//相机viewportRect参数
 		float X, Y, W, H;
+private:
+		glm::vec3 const worldUpDir = glm::vec3(0, 1, 0);
+
 		float pitch;
 		float yaw;
 

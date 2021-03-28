@@ -43,13 +43,7 @@ namespace softRD
 		//	
 		//}
 
-		glm::vec4 Test(const V2f& v2f)
-		{
-			//return glm::vec4(v2f.windowPos.z);
-			return block.albedo->Sampler2D(v2f.texcoord);
-			return glm::vec4(0.2, 0.5, 0.8, 1);
-		}
-		void AddPass(const std::function<V2f(const Vertex&)>& vertexShader,const std::function<glm::vec4(const V2f&)>& fragmentShader)
+		inline void AddPass(const std::function<V2f(const Vertex&)>& vertexShader,const std::function<glm::vec4(const V2f&)>& fragmentShader)
 		{
 			pass.push_back(Pass(vertexShader, fragmentShader));
 		}

@@ -114,44 +114,29 @@ namespace softRD
 			x2 = fMath::Clamp(x2, 0, 800);
 			y1 = fMath::Clamp(y1, 0, 600);
 			y2 = fMath::Clamp(y2, 0, 600);
-			for (int i = x1; i <= x2; i++)
+			for (register int i = x1; i <= x2; i++)
 			{
-				for (int j = y1; j <= y2; j++)
+				for (register int j = y1; j <= y2; j++)
 				{
 					//std::cout << i << " " << j << std::endl;
 					//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
 					if (InsideTriangle(i, j, o1.windowPos, o2.windowPos, o3.windowPos))
 					{
-						glm::vec3 centric = fMath::barycentric(o1.windowPos, o2.windowPos, o3.windowPos, glm::vec4(i, j, 0, 0));
-						//cout << vec2(i, j) << endl;
-						if (centric.x > 0 && centric.y > 0 && centric.z > 0)
+						float rA = (-(i - o2.windowPos.x) * (o3.windowPos.y - o2.windowPos.y) + (j - o2.windowPos.y) * (o3.windowPos.x - o2.windowPos.x)) / (-(o1.windowPos.x - o2.windowPos.x) * (o3.windowPos.y - o2.windowPos.y) + (o1.windowPos.y - o2.windowPos.y) * (o3.windowPos.x - o2.windowPos.x));
+						float rB = (-(i - o3.windowPos.x) * (o1.windowPos.y - o3.windowPos.y) + (j - o3.windowPos.y) * (o1.windowPos.x - o3.windowPos.x)) / (-(o2.windowPos.x - o3.windowPos.x) * (o1.windowPos.y - o3.windowPos.y) + (o2.windowPos.y - o3.windowPos.y) * (o1.windowPos.x - o3.windowPos.x));
+						float rC = 1.0f - rA - rB;
+						if (rA > 0 && rB > 0 && rC > 0)
 						{
-							
-							//重心坐标可能会变，需要明天找解决办法(好像是变换回去，在进行一次中心坐标插值,还是不太懂
-							//glm::vec4 _color		= (o1.color * centric.x + o2.color * centric.y + o3.color * centric.z);
-							//glm::vec4 _windowpos	= (o1.windowPos * centric.x + o2.windowPos * centric.y + o3.windowPos * centric.z);
-							//glm::vec4 _worldPos		= (o1.worldPos * centric.x + o2.worldPos * centric.y + o3.worldPos * centric.z);
-							//glm::vec3 _normal		= (o1.normal * centric.x + o2.normal * centric.y + o3.normal * centric.z);
-							//glm::vec2 _texcoord		= (o1.texcoord * centric.x + o2.texcoord * centric.y + o3.texcoord * centric.z);
-							//float _z = (o1.Z * centric.x + o2.Z * centric.y + o3.Z * centric.z);
+							float _z = o1.windowPos.z * rA + o2.windowPos.z * rB + o3.windowPos.z * rC;
 
-							V2f o;
-							o.color		= (o1.color * centric.x + o2.color * centric.y + o3.color * centric.z);
-							o.windowPos	= (o1.windowPos * centric.x + o2.windowPos * centric.y + o3.windowPos * centric.z);
-							o.worldPos	= (o1.worldPos * centric.x + o2.worldPos * centric.y + o3.worldPos * centric.z);
-							o.normal		= (o1.normal * centric.x + o2.normal * centric.y + o3.normal * centric.z);
-							o.texcoord	= (o1.texcoord * centric.x + o2.texcoord * centric.y + o3.texcoord * centric.z);
-							o.Z			= (o1.Z * centric.x + o2.Z * centric.y + o3.Z * centric.z);
-
-							//V2f o(o1 * centric.x + o2 * centric.y + o3 * centric.z);
-							//std::cout << o.texcoord.x << " " << o.texcoord.y << " ???????????" << std::endl;
-							//std::cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << std::endl;
-							//std::cout << o2.windowPos.x << " " << o2.windowPos.y << " " << o2.windowPos.z << " " << o2.windowPos.w << std::endl;
-							//std::cout << o3.windowPos.x << " " << o3.windowPos.y << " " << o3.windowPos.z << " " << o3.windowPos.w << std::endl;
-							//std::cout << o.windowPos.x << " " << o.windowPos.y << " " << o.windowPos.z << " " << o.windowPos.w << std::endl;
-							//std::cout << o.windowPos.z << " " << Global::frameBuffer->GetDepth(i, j) << std::endl;
-							if (o.windowPos.z< Global::frameBuffer->GetDepth(i,j))
+							if (_z< Global::frameBuffer->GetDepth(i,j))
 							{
+								V2f o = V2f((o1.worldPos * rA + o2.worldPos * rB + o3.worldPos * rC),
+									(o1.windowPos * rA + o2.windowPos * rB + o3.windowPos * rC),
+									(o1.color * rA + o2.color * rB + o3.color * rC),
+									(o1.normal * rA + o2.normal * rB + o3.normal * rC),
+									(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
+									(o1.Z * rA + o2.Z * rB + o3.Z * rC));
 								float divZ = (1.0f / o.Z);
 								//std::cout << o.Z << std::endl;
 								o.worldPos *= divZ;
@@ -159,9 +144,9 @@ namespace softRD
 								o.color *= divZ;
 								o.texcoord *= divZ;
 								Global::frameBuffer->WriteDepth(i, j, o.windowPos.z);
-								(resList + index)->y = j;
-								(resList + index)->x = i;
-								(resList + index)->o = o;
+								resList[index].y = j;
+								resList[index].x = i;
+								resList[index].o = o;
 								//(resList + index)->setTexture(o.texcoord.x, o.texcoord.y);
 								//(resList + index)->setWindowpos(o.windowPos.x, o.windowPos.y, o.windowPos.z, o.windowPos.w);
 								//(resList + index)->setColor(o.color.x, o.color.y, o.color.z, o.color.w);
@@ -183,6 +168,7 @@ namespace softRD
 							}
 							//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
 						}
+					
 					}
 
 				}
@@ -244,7 +230,7 @@ namespace softRD
 			}
 		}
 
-		bool InsideTriangle(int x, int y, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3)
+		inline bool InsideTriangle(int x, int y, const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3)
 		{
 			glm::vec3 p(x, y, 0);
 			auto a = glm::cross((p - v1), (v2 - v1));
@@ -256,14 +242,12 @@ namespace softRD
 				false;
 		}
 
-		void Rasterization::GetBoundBox(const glm::vec4& o1, const glm::vec4& o2, const glm::vec4& o3, int& x1, int& y1, int& x2, int& y2)
+		inline void Rasterization::GetBoundBox(const glm::vec4& o1, const glm::vec4& o2, const glm::vec4& o3, int& x1, int& y1, int& x2, int& y2)
 		{
-			//cout<< (min(o1.x, o2.x), o3.x)<<endl;
 			x1 = std::min(std::min(o1.x, o2.x), o3.x);
 			x2 = std::max(std::max(o1.x, o2.x), o3.x);
 			y1 = std::min(std::min(o1.y, o2.y), o3.y);
 			y2 = std::max(std::max(o1.y, o2.y), o3.y);
-			//cout <<o1.x<<" "<<o2.x<<" "<< x1 << " " << x2 << endl;
 		}
 
 		raster_res resList[400000];

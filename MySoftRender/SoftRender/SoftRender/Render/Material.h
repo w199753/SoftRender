@@ -65,7 +65,7 @@ namespace softRD
 			Global::triangleCount = 0;
 			for (int i = 0; i < stream.size(); i++)
 			{
-				for (size_t s = 0; s < shader->pass.size(); s++)
+				for (int s = 0; s < shader->pass.size(); s++)
 				{
 					V2f o1 = shader->pass[s].vertexShader(stream[i]->v2());
 					V2f o2 = shader->pass[s].vertexShader(stream[i]->v1());
@@ -78,10 +78,12 @@ namespace softRD
 						Global::raster->RasterTriangle(o1, o2, o3);
 						Global::verticesCount +=3/shader->pass.size();
 						Global::triangleCount +=1/shader->pass.size();
-						auto resList = Global::raster->resList;
-						for (size_t i = 0; i < Global::raster->index; i++)
+						//auto resList = ;
+						int len = Global::raster->index;
+						//std::cout << len << std::endl;
+						for (register int i = 0; i < len; i++)
 						{
-							Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, shader->pass[s].fragmentShader(resList[i].o));
+							Global::frameBuffer->WriteColor(Global::raster->resList[i].x, Global::raster->resList[i].y, shader->pass[s].fragmentShader(Global::raster->resList[i].o));
 							//Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, shader->FragmentShader(resList[i].o));
 
 						//Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, glm::vec4(1));
@@ -99,6 +101,10 @@ namespace softRD
 		{
 
 			//cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << endl;
+			if (cull.FrumstumCull(o1, o2, o3))
+			{
+				return false;
+			}
 
 			PerspectiveDivision(o1);
 			PerspectiveDivision(o2);
@@ -125,13 +131,12 @@ namespace softRD
 			v.windowPos.z = (v.windowPos.z + 1.0) * 0.5;
 
 			//--透视矫正插值:使用w还是使用z关系不大，因为可以推出用1/z做矫正，z和w为线性关系，后来业界统一为用w
-
 			v.normal *= v.Z;
 			v.color *= v.Z;
 			v.texcoord *= v.Z;
 			v.worldPos *= v.Z;
 		}
-		//PropertyBlock block;
+
 	};
 
 }

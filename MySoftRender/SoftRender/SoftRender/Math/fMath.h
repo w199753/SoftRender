@@ -22,7 +22,7 @@ public:
 
 
 	template<typename T>
-	static T Clamp(const T value, const T a, const T b);
+	static T Clamp(const T& value, const T& a, const T& b);
 
 	template<typename T>
 	static T Saturate(const T& value);
@@ -117,7 +117,7 @@ T fMath::Lerp(const T& a, const T& b, const float t)
 
 
 template<typename T>
-T fMath::Clamp(const T value, const T a, const T b)
+T fMath::Clamp(const T& value, const T& a, const T& b)
 {
 	if (value < a)return a;
 	else if (value > b)return b;

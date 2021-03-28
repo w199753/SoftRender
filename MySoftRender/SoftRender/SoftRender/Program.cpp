@@ -29,6 +29,11 @@ double starty = 0;
 int fps = 0;
 int vertCount = 0;
 int traCount = 0;
+
+bool firstMouse = true;
+double lastX = 0;
+double lastY = 0;
+
 //button:0左键，1右键，2中
 //Action：1按下 0释放
 //Mode:没用到不知道
@@ -41,10 +46,12 @@ static void mouse_btn_callback(GLFWwindow* pWindow, int Button, int Action, int 
 		{
 			//https://blog.csdn.net/qq_40239482/article/details/105834521
 			glfwGetCursorPos(pWindow, &startx, &starty);
-			starty = SCR_HEIGHT - starty;
-			startx = startx - SCR_WIDTH;
-			starty = starty - SCR_HEIGHT;
+			//starty = SCR_HEIGHT - starty;
+			//startx = startx - SCR_WIDTH;
+			//starty = starty - SCR_HEIGHT;
 			//startx
+			lastX = startx;
+			lastY = SCR_HEIGHT-starty;
 		}
 	}
 }
@@ -52,21 +59,26 @@ static void mouse_btn_callback(GLFWwindow* pWindow, int Button, int Action, int 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	ypos = SCR_HEIGHT - ypos;
-	xpos = xpos - SCR_WIDTH;
-	ypos = ypos - SCR_HEIGHT;
+	//xpos = xpos - SCR_WIDTH;
+	//ypos = ypos - SCR_HEIGHT;
 	if (isDragView)
 	{
-		//std::cout << xpos << " " << ypos << std::endl;
-		//glm::vec3 r = glm::normalize(glm::vec3(xpos - startx, ( starty- ypos), 0));
-		//std::cout << r.x << " " << r.y << std::endl;
-		//Global::mainCamera->SetRotate(glm::vec3(r.y, r.x,0));
+		float xoffset = xpos - lastX;
+		float yoffset = lastY - ypos;
+		lastX = xpos;
+		lastY = ypos;
+
+		float sensitivity = 0.1f;//灵敏度
+		xoffset *= sensitivity;
+		yoffset *= sensitivity;
+		Global::mainCamera->SetRotate(glm::vec3(-yoffset, -xoffset, 0));
 	}
 }
 
 void scroll_callback(GLFWwindow* window, double xoffeset, double yoffset)
 {
 	pos.z -= yoffset * 0.5;
-	Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+	Global::mainCamera->MoveForward(yoffset*0.5f);
 }
 
 void processInput(GLFWwindow* window)
@@ -77,37 +89,37 @@ void processInput(GLFWwindow* window)
 	{
 		addDelta = true;
 		pos.x -= 0.02 * delta;
-		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+		Global::mainCamera->MoveHorizontal(-0.02 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.x += 0.02 * delta;
-		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+		Global::mainCamera->MoveHorizontal(0.02 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.z -= 0.02 * delta;
-		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+		Global::mainCamera->MoveForward(0.02 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.z += 0.02 * delta;
-		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+		Global::mainCamera->MoveForward(-0.02 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.y -= 0.02 * delta;
-		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+		Global::mainCamera->MoveVertical(-0.02 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.y += 0.02 * delta;
-		Global::mainCamera->SetTransformParam(pos, pos + look, rot);
+		Global::mainCamera->MoveVertical(0.02 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE &&
 		glfwGetKey(window, GLFW_KEY_Q) == GLFW_RELEASE &&
@@ -177,7 +189,7 @@ int main()
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, static_cast<float>(SCR_WIDTH), static_cast<float>(SCR_HEIGHT));
 	Global::mainCamera->SetTransformParam(pos, pos + look, glm::vec3(0));
-	Global::mainCamera->SetProjectParams(1.f, 100.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
+	Global::mainCamera->SetProjectParams(0.3f, 100.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
 
 	Global::frameBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
 
@@ -202,7 +214,7 @@ int main()
 	Object obj("Model/Scanner.obj", obj_material);
 	obj.SetScale(0.0004, 0.0004, 0.0004);
 	obj.SetRotate(0, 90, 0);
-	obj.SetTranslate(0, -0.5, 0.0);
+	obj.SetTranslate(0, -0.5, 0.0+0.45);
 
 	//PropertyBlock block1;
 	//block1.albedo = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR);
