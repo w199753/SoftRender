@@ -22,58 +22,14 @@ namespace softRD
 		return RasterType((int)a & (int)b);
 	}
 
-	struct raster_res
+	class raster_res
 	{
 	public:
-		raster_res() {}
-		raster_res(int _x, int _y,const V2f& _o)
+		raster_res() :x(0), y(0), o(V2f()) {}
+		raster_res(int _x, int _y, const V2f& _o) :x(_x), y(_y), o(_o)
 		{
-			x = _x;
-			y = _y;
-			o = _o;
 		}
-		//inline void setWindowpos(float x, float y, float z, float w)
-		//{
-		//	//o.windowPos.x = x;
-		//	//o.windowPos.y = y;
-		//	//o.windowPos.z = z;
-		//	//o.windowPos.w = w;
-		//	o.windowPos = glm::vec4(x,y,z,w);
-		//}
-
-		//inline void setTexture(float x, float y)
-		//{
-		//	o.texcoord = glm::vec2(x,y);
-		//	//o.texcoord.x = x;
-		//	//o.texcoord.y = y;
-		//}
-
-		//inline void setWorldpos(float x, float y, float z, float w)
-		//{
-		//	o.worldPos = glm::vec4(x,y,z,w);
-		//	//o.worldPos.x = x;
-		//	//o.worldPos.y = y;
-		//	//o.worldPos.z = z;
-		//	//o.worldPos.w = w;
-		//}
-
-		//inline void setNormal(float x, float y, float z)
-		//{
-		//	o.normal = glm::vec3(x,y,z);
-		//	//o.normal.x = x;
-		//	//o.normal.y = y;
-		//	//o.normal.z = z;
-		//}
-
-		//inline void setColor(float x, float y, float z,float w)
-		//{
-		//	o.color = glm::vec4(x,y,z,w);
-		//	//o.color.x = x;
-		//	//o.color.y = y;
-		//	//o.color.z = z;
-		//	//o.color.w = w;
-		//}
-		int x=0, y=0;
+		int x = 0, y = 0;
 		V2f o;
 
 	};
@@ -82,7 +38,7 @@ namespace softRD
 	public:
 		Rasterization() {  }
 		~Rasterization() {}
-		
+
 
 		void SetRasterType(RasterType _type)
 		{
@@ -125,66 +81,45 @@ namespace softRD
 						float rA = (-(i - o2.windowPos.x) * (o3.windowPos.y - o2.windowPos.y) + (j - o2.windowPos.y) * (o3.windowPos.x - o2.windowPos.x)) / (-(o1.windowPos.x - o2.windowPos.x) * (o3.windowPos.y - o2.windowPos.y) + (o1.windowPos.y - o2.windowPos.y) * (o3.windowPos.x - o2.windowPos.x));
 						float rB = (-(i - o3.windowPos.x) * (o1.windowPos.y - o3.windowPos.y) + (j - o3.windowPos.y) * (o1.windowPos.x - o3.windowPos.x)) / (-(o2.windowPos.x - o3.windowPos.x) * (o1.windowPos.y - o3.windowPos.y) + (o2.windowPos.y - o3.windowPos.y) * (o1.windowPos.x - o3.windowPos.x));
 						float rC = 1.0f - rA - rB;
-						if (rA > 0 && rB > 0 && rC > 0)
+						float _z = o1.windowPos.z * rA + o2.windowPos.z * rB + o3.windowPos.z * rC;
+						if (_z < Global::frameBuffer->GetDepth(i, j))
 						{
-							float _z = o1.windowPos.z * rA + o2.windowPos.z * rB + o3.windowPos.z * rC;
+							Global::frameBuffer->WriteDepth(i, j, _z);
+							V2f o((o1.worldPos * rA + o2.worldPos * rB + o3.worldPos * rC),
+								(o1.windowPos * rA + o2.windowPos * rB + o3.windowPos * rC),
+								(o1.color * rA + o2.color * rB + o3.color * rC),
+								(o1.normal * rA + o2.normal * rB + o3.normal * rC),
+								(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
+								(o1.Z * rA + o2.Z * rB + o3.Z * rC));
+							float divZ = (1.0f / o.Z);
+							o.worldPos *= divZ;
+							o.normal *= divZ;
+							o.color *= divZ;
+							o.texcoord *= divZ;
 
-							if (_z< Global::frameBuffer->GetDepth(i,j))
-							{
-								V2f o = V2f((o1.worldPos * rA + o2.worldPos * rB + o3.worldPos * rC),
-									(o1.windowPos * rA + o2.windowPos * rB + o3.windowPos * rC),
-									(o1.color * rA + o2.color * rB + o3.color * rC),
-									(o1.normal * rA + o2.normal * rB + o3.normal * rC),
-									(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
-									(o1.Z * rA + o2.Z * rB + o3.Z * rC));
-								float divZ = (1.0f / o.Z);
-								//std::cout << o.Z << std::endl;
-								o.worldPos *= divZ;
-								o.normal *= divZ;
-								o.color *= divZ;
-								o.texcoord *= divZ;
-								Global::frameBuffer->WriteDepth(i, j, o.windowPos.z);
-								resList[index].y = j;
-								resList[index].x = i;
-								resList[index].o = o;
-								//(resList + index)->setTexture(o.texcoord.x, o.texcoord.y);
-								//(resList + index)->setWindowpos(o.windowPos.x, o.windowPos.y, o.windowPos.z, o.windowPos.w);
-								//(resList + index)->setColor(o.color.x, o.color.y, o.color.z, o.color.w);
-								//(resList + index)->setNormal(o.normal.x, o.normal.y, o.normal.z);
-								//(resList + index)->setWorldpos(o.worldPos.x, o.worldPos.y, o.worldPos.z, o.worldPos.w);
+							resList[index].y = j;
+							resList[index].x = i;
+							resList[index].o = o;
+							index++;
 
-								//resList[index].y =j;
-								//resList[index].x = i; //= (raster_res(i, j, o));
-								//resList[index].o = o;
-								//resList[index].setTexture(o.texcoord.x, o.texcoord.y);
-								//resList[index].setWindowpos(o.windowPos.x, o.windowPos.y, o.windowPos.z, o.windowPos.w);
-								//resList[index].setColor(o.color.x, o.color.y, o.color.z, o.color.w);
-								//resList[index].setNormal(o.normal.x, o.normal.y, o.normal.z);
-								//resList[index].setWorldpos(o.worldPos.x, o.worldPos.y, o.worldPos.z, o.worldPos.w);
-								index++;
-								//resList[index] = raster_res(i, j, o);
-								//resList.push_back(raster_res(i, j, o));
-								//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
-							}
-							//Global::frameBuffer->WriteColor(i, j, glm::vec4(1));
 						}
-					
+
 					}
 
 				}
 			}
 		}
-		void RasterLine(const V2f& from,const V2f& to)
+		void RasterLine(const V2f& from, const V2f& to)
 		{
 			int dx = to.windowPos.x - from.windowPos.x;
 			int dy = to.windowPos.y - from.windowPos.y;
 			int xDelta = 1, yDelta = 1;
-			if (dx<0)
+			if (dx < 0)
 			{
 				xDelta = -xDelta;
 				dx = -dx;
 			}
-			if (dy<0)
+			if (dy < 0)
 			{
 				yDelta = -yDelta;
 				dy = -dy;
@@ -199,7 +134,7 @@ namespace softRD
 				for (int i = 0; i <= dx; ++i)
 				{
 					tmp = fMath::Lerp(from, to, ((float)(i) / dx));
-					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(0,0.8,0,1));
+					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(0, 0.8, 0, 1));
 					currentX += xDelta;
 					if (P <= 0)
 						P += 2 * dy;
@@ -236,7 +171,7 @@ namespace softRD
 			auto a = glm::cross((p - v1), (v2 - v1));
 			auto b = glm::cross((p - v2), (v3 - v2));
 			auto c = glm::cross((p - v3), (v1 - v3));
-			if ((a.z > 0 && b.z > 0 && c.z) || (a.z < 0 && b.z < 0 && c.z < 0))
+			if ((a.z > 0 && b.z > 0 && c.z > 0) || (a.z < 0 && b.z < 0 && c.z < 0))
 				return true;
 			return
 				false;

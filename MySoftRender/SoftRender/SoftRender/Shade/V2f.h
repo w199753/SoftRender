@@ -5,14 +5,14 @@ namespace softRD
 	class V2f
 	{
 	public:
-		glm::vec4 worldPos = glm::vec4(0);
-		glm::vec4 windowPos = glm::vec4(0);
-		glm::vec4 color = glm::vec4(0);
-		glm::vec3 normal = glm::vec3(0);
-		glm::vec2 texcoord = glm::vec2(0);
-		float		Z = 0;
+		glm::vec4 worldPos;
+		glm::vec4 windowPos;
+		glm::vec4 color;
+		glm::vec3 normal;
+		glm::vec2 texcoord;
+		float		Z;
 
-		V2f() {
+		V2f() :worldPos(glm::vec4(0)), windowPos(glm::vec4(0)), color(glm::vec4(0)), normal(glm::vec3(0)), texcoord(glm::vec2(0)), Z(0) {
 		}
 		V2f(const glm::vec4& _worldPos,
 			const glm::vec4& _windowPos,

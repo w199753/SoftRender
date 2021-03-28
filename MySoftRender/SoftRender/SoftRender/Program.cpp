@@ -179,17 +179,29 @@ public:
 class BB
 {
 public:
-	int bbb;
+	BB() { cout << "BB" << endl; }
+	BB(const BB& b)
+	{
+		{ cout << "BB" << endl; }
+	}
+	~BB() { cout << "NOBB" << endl; }
 };
 
 int main()
 {
-
+	vector<BB> bbb;
+	bbb.reserve(3);
+	bbb.emplace_back();
+	bbb.emplace_back();
+	bbb.emplace_back();
+	//bbb.push_back(BB());
+	//bbb.push_back(BB());
+	//bbb.push_back(BB());
 	//std::unique_ptr<Camera> main = ;
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, static_cast<float>(SCR_WIDTH), static_cast<float>(SCR_HEIGHT));
 	Global::mainCamera->SetTransformParam(pos, pos + look, glm::vec3(0));
-	Global::mainCamera->SetProjectParams(0.3f, 100.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
+	Global::mainCamera->SetProjectParams(0.6f, 100.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
 
 	Global::frameBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
 

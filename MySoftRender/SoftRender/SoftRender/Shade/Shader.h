@@ -45,7 +45,8 @@ namespace softRD
 
 		inline void AddPass(const std::function<V2f(const Vertex&)>& vertexShader,const std::function<glm::vec4(const V2f&)>& fragmentShader)
 		{
-			pass.push_back(Pass(vertexShader, fragmentShader));
+			pass.reserve(3);
+			pass.emplace_back(vertexShader, fragmentShader);
 		}
 
 		//void AddPass(std::function<V2f(Shader&, const Vertex&)> vertexShader, std::function<glm::vec4(Shader&, const V2f&)> fragmentShader)

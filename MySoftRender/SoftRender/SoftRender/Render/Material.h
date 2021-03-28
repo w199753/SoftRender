@@ -52,14 +52,14 @@ namespace softRD
 
 		}
 
-		void SetShader(std::unique_ptr<Shader> _shader)
+		void SetShader(std::unique_ptr<Shader>& _shader)
 		{
 			shader = std::move(_shader);
 			//shader->AddPass();
 			//shader->AddPass(shader->VertexShader(),)
 		}
 
-		void Render(std::vector<Triangle*> stream)
+		void Render(const std::vector<Triangle*>& stream)
 		{
 			Global::verticesCount = 0;
 			Global::triangleCount = 0;

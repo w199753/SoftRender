@@ -10,7 +10,7 @@ namespace softRD
 	class Mesh
 	{
 	public:
-		Mesh() {}
+		Mesh() { triangleStream.reserve(100); }
 		~Mesh() {}
 
 		inline void PushVertex(const Vertex& v)
@@ -29,22 +29,22 @@ namespace softRD
 
 		void BuildTriangleStream()
 		{
-			for (size_t i = 0; i < Indices.size(); i += 3)
+			for (int i = 0; i < Indices.size(); i += 3)
 			{
 				Triangle* t = new Triangle();
 				t->AddVertices(Vertices[i], Vertices[i + 1], Vertices[i + 2]);
-				triangleStream.push_back(t);
+				triangleStream.emplace_back(t);
 			}
 		}
 
-		int getVectorVerticesSize() const { return Vertices.size(); }
+		inline int getVectorVerticesSize() const { return Vertices.size(); }
 
-		void setVerticesCount(int c) { verticesCount = c; }
-		int getVerticesCount()const { return verticesCount; }
+		inline void setVerticesCount(int c) { verticesCount = c; }
+		inline int getVerticesCount()const { return verticesCount; }
 
-		int getTrianglesCount()const { return Indices.size() / 3; }
+		inline int getTrianglesCount()const { return Indices.size() / 3; }
 
-		std::vector<Triangle*> getTriangleStream() const { return triangleStream; }
+		inline const std::vector<Triangle*>& getTriangleStream() const { return triangleStream; }
 	private:
 		int verticesCount = 0;
 		std::vector<Vertex> Vertices;

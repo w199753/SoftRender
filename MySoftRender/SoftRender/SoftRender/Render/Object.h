@@ -32,14 +32,14 @@ namespace softRD
 			material.shader->block.transform->SetRotate(x, y, z);
 		}
 
-		void RenderObject()
+		inline void RenderObject()
 		{
 			material.Render(mesh.getTriangleStream());
 		}
 
 		//Transform& getTrans()const{return std::move(trans;}
 
-		Mesh GetMesh()const { return mesh; }
+		inline const Mesh& GetMesh()const { return mesh; }
 	private:
 		Mesh mesh;
 		Material& material;

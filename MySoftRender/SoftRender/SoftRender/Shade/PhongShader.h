@@ -42,7 +42,8 @@ namespace softRD
 		glm::vec4 FragmentShader(const V2f& v2f)override
 		{
 			//return glm::vec4(v2f.windowPos.z);
-			return block.albedo->Sampler2D(v2f.texcoord);
+			glm::vec4 col = block.albedo->Sampler2D(v2f.texcoord);
+			return col;
 			return glm::vec4(0.2, 0.5, 0.8, 1);
 		}
 
