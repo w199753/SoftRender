@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include<glm/matrix.hpp>
 #include"../Common/Global.h"
+#include"../Math/fMath.h"
 #include"Transform.hpp"
 #include<iostream>
 namespace softRD
@@ -67,7 +68,7 @@ namespace softRD
 
 		}
 		//设置变换参数
-		void SetTransformParam(const glm::vec3& pos, const glm::vec3& lookat, const glm::vec3& eulerAngle)
+		void SetTransformParam(const glm::vec3& pos, const glm::vec3& lookat, const glm::vec3& _eulerAngle)
 		{
 			position = pos;
 			forward = glm::normalize(lookat- pos);  //规定相机看向z的负半轴
@@ -87,10 +88,11 @@ namespace softRD
 			viewMatrix[3][1] = -glm::dot(position, up);
 			viewMatrix[3][2] = glm::dot(position, forward);
 
-			glm::vec3 euler = Dir2Euler(forward);
-			pitch = euler.x;
-			yaw = euler.y;
-			std::cout << pitch << " " << yaw << std::endl;
+			eulerAngle = fMath::Dir2Euler(forward);
+			pitch = eulerAngle.x;
+			yaw = eulerAngle.y;
+			std::cout << eulerAngle.x << " " << eulerAngle.y << " " << eulerAngle.z << " " << std::endl;
+			//std::cout << pitch << " " << yaw << std::endl;
 			//for (size_t i = 0; i < 4; i++)
 			//{
 			//	for (size_t j = 0; j < 4; j++)
@@ -121,7 +123,7 @@ namespace softRD
 
 		void updateMatrix()
 		{
-			glm::vec3 _front = Euler2Dir(glm::vec3(pitch, yaw, 0.0f));
+			glm::vec3 _front = fMath::Euler2Dir(glm::vec3(pitch, yaw, 0.0f));
 			forward = glm::normalize(_front);  //规定相机看向z的负半轴
 			right = glm::normalize(glm::cross(forward, worldUpDir));
 			up = glm::normalize(glm::cross(right, forward));
@@ -137,6 +139,15 @@ namespace softRD
 			viewMatrix[3][0] = -glm::dot(position, right);
 			viewMatrix[3][1] = -glm::dot(position, up);
 			viewMatrix[3][2] = glm::dot(position, forward);
+			eulerAngle = fMath::Dir2Euler(forward);
+
+			pitch = eulerAngle.x;
+			yaw = eulerAngle.y<0?eulerAngle.y+360:eulerAngle.y;
+			//std::cout << pitch << " " << yaw << " " << std::endl;
+			//std::cout << eulerAngle.x << " " << eulerAngle.y << " " << eulerAngle.z << " " << std::endl;
+			//std::cout << forward.x << " " << forward.y << " " << forward.z << std::endl;
+			//pitch = eulerAngle.x;
+			//yaw = eulerAngle.y;
 		}
 
 		void SetRotate(const glm::vec3 angle)
@@ -154,33 +165,11 @@ namespace softRD
 			updateMatrix();
 		}
 
-		glm::vec3 Euler2Dir(const glm::vec3& fromEuler) {
-			glm::vec3 dir = glm::vec3(1.0f);
-			dir.x = cos(glm::radians(fromEuler.x)) * sin(glm::radians(fromEuler.y));
-			dir.y = sin(glm::radians(fromEuler.x));
-			dir.z = cos(glm::radians(fromEuler.x)) * cos(glm::radians(fromEuler.y));
-			return dir;
-		}
-		glm::vec3 Dir2Euler(const glm::vec3& fromDir)
-		{
-			glm::vec3 eulerAngles = glm::vec3(1.0f);
-			//pitch = arc cos(sqrt((x^2 + z^2)/(x^2+y^2+z^2)))
-			eulerAngles.x = glm::degrees(acos(sqrt((fromDir.x * fromDir.x + fromDir.z * fromDir.z) / (fromDir.x * fromDir.x + fromDir.y * fromDir.y + fromDir.z * fromDir.z))));
-			if (fromDir.y < 0)
-				eulerAngles.x = -eulerAngles.x;
-			//yaw = arc tan(x/z)
-			eulerAngles.y = glm::degrees(atan2(fromDir.x, fromDir.z));
-
-			//roll = 0
-			eulerAngles.z = 0;
-			return eulerAngles;
-		}
-
 		glm::mat4x4 viewMatrix = glm::mat4x4(1);
 		glm::mat4x4 projectMatrix = glm::mat4x4(0);
 		glm::mat4x4 viewportMatrix = glm::mat4x4(1);
 		glm::vec3 up = glm::vec3(0), right = glm::vec3(0), forward = glm::vec3(0), position = glm::vec3(0);
-	
+		glm::vec3 eulerAngle = glm::vec3(0);
 
 		//透视投影所需参数
 		float Near, Far, fov, aspect;    //这里fov为纵向，aspect为宽高比

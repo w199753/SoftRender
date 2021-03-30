@@ -2,6 +2,7 @@
 #include"Shader.h"
 #include<glm/matrix.hpp>
 #include"../Common/Global.h"
+#include"../Light/Light.h"
 #include<iostream>
 using namespace std;
 namespace softRD
@@ -43,7 +44,12 @@ namespace softRD
 		{
 			//return glm::vec4(v2f.windowPos.z);
 			glm::vec4 col = block.albedo->Sampler2D(v2f.texcoord);
-			return col;
+			auto L = Global::pointLightList[0]->position - glm::vec3(v2f.worldPos);
+			auto c = Global::pointLightList[0]->color;
+			auto i = Global::pointLightList[0]->intensity;
+			auto a = Global::pointLightList[0]->getAttenuation(v2f.worldPos);
+			//std::cout << v2f.worldPos.x<<" "<< v2f.worldPos .y<<" "<< v2f.worldPos .z<<" "<< v2f.worldPos .w<< " " << std::endl;
+			return col*std::max(0.001f,glm::dot(glm::normalize(L),glm::normalize(v2f.normal)))*glm::vec4(c.x,c.y,c.z,1)*i*a;
 			return glm::vec4(0.2, 0.5, 0.8, 1);
 		}
 

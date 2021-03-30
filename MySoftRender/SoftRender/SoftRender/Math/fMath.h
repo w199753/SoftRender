@@ -81,7 +81,8 @@ public:
 	static glm::mat4 GetViewPortMatrix(const int ox, const int oy, const int width, const int height);
 
 	static bool FaceCulling(glm::vec4& a, glm::vec4& b, glm::vec4& c, const glm::vec3 view, bool isFront);
-
+	static glm::vec3 Euler2Dir(const glm::vec3& fromEuler);
+	static glm::vec3 Dir2Euler(const glm::vec3& fromDir);
 	static glm::vec3 GetFaceNormal(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3);
 	static glm::vec4& Linear2Srgb(glm::vec4& col);
 	static glm::vec4& Srgb2Linear(glm::vec4& col);

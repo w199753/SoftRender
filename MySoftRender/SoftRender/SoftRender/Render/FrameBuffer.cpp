@@ -1,5 +1,6 @@
 #include "FrameBuffer.h"
 #include "../Common/Global.h"
+#include"../Math/fMath.h"
 #include<algorithm>
 
 using namespace softRD;
@@ -32,10 +33,10 @@ void FrameBuffer::WriteColor(int x, int y, const glm::vec4& col)
 	}
 	int xy = 4*(y * width + x);
 	auto colItr = colorBuffer.begin() + xy;
-	*(colItr) = col.x * 255;
-	*(colItr + 1) = col.y * 255;
-	*(colItr + 2) = col.z * 255;
-	*(colItr + 3) = col.w * 255;
+	*(colItr) = fMath::Clamp((int)(col.x * 255), 0, 255);
+	*(colItr + 1) = fMath::Clamp((int)(col.y * 255), 0, 255);
+	*(colItr + 2) = fMath::Clamp((int)(col.z * 255), 0, 255);
+	*(colItr + 3) = fMath::Clamp((int)(col.w * 255), 0, 255);
 }
 
 void softRD::FrameBuffer::WriteDepth(int x, int y, const float v)

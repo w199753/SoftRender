@@ -3,7 +3,7 @@
 #define __MAT__H__
 /*
 说明：
-默认使用行向量填充
+默认使用行向量填充,写了一坨屎，simd也是负优化······ 也不知道自己写这东西干啥
 */
 #include"vec.h"
 #include"math_def.h"

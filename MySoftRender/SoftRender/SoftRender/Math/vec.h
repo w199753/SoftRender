@@ -3,6 +3,11 @@
 #ifndef __VEC__H__
 #define __VEC__H__
 
+/*
+说明：
+写了一坨屎，simd也是负优化······ 也不知道自己写这东西干啥
+*/
+
 #include<immintrin.h>
 #include<iostream>
 #include"math_def.h"

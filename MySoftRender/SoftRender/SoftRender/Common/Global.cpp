@@ -2,6 +2,7 @@
 #include "../Render/Camera.h"
 #include "../Render/Rasterization.h"
 #include"../Render/FrameBuffer.h"
+#include"../Light/Light.h"
 using namespace softRD;
 
 //constexpr float oneDiv255 = 1 / 255.0f;
@@ -12,6 +13,7 @@ using namespace softRD;
 std::unique_ptr<Camera> Global::mainCamera = nullptr;
 std::unique_ptr<Rasterization> Global::raster = nullptr;
 std::unique_ptr<FrameBuffer> Global::frameBuffer = nullptr;
+std::vector<std::unique_ptr<PointLight>> Global::pointLightList;
 float Global::triangleCount = 0;
 float Global::verticesCount = 0;
 //void Global::SetMainCamera(std::unique_ptr<Camera>_main)

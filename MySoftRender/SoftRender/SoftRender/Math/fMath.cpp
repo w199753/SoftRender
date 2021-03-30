@@ -1,8 +1,9 @@
 #include "fMath.h"
+#include <glm/trigonometric.hpp>
 
 float fMath::Distance(const glm::vec3 & src, const glm::vec3 & dest)
 {
-	return (src - dest).length();
+	return glm::length(src - dest);
 	//return sqrtf((dest.x - src.x)*(dest.x - src.x) + (dest.y - src.y)*(dest.y - src.y) + (dest.z - src.z)*(dest.z - src.z));
 }
 
@@ -142,6 +143,29 @@ glm::mat4 fMath::GetViewPortMatrix(const int ox, const int oy, const int width, 
 	result[3][0] = static_cast<float>(ox) + (width / 2.0f);
 	result[3][1] = static_cast<float>(oy) + (height / 2.0f);
 	return (result);
+}
+
+glm::vec3 fMath::Euler2Dir(const glm::vec3& fromEuler) {
+	glm::vec3 dir = glm::vec3(1.0f);
+	dir.x = cos(glm::radians(fromEuler.x)) * sin(glm::radians(fromEuler.y));
+	dir.y = sin(glm::radians(fromEuler.x));
+	dir.z = cos(glm::radians(fromEuler.x)) * cos(glm::radians(fromEuler.y));
+	return dir;
+}
+
+glm::vec3 fMath::Dir2Euler(const glm::vec3& fromDir)
+{
+	glm::vec3 eulerAngles = glm::vec3(1.0f);
+	//pitch = arc cos(sqrt((x^2 + z^2)/(x^2+y^2+z^2)))
+	eulerAngles.x = glm::degrees(acos(sqrt((fromDir.x * fromDir.x + fromDir.z * fromDir.z) / (fromDir.x * fromDir.x + fromDir.y * fromDir.y + fromDir.z * fromDir.z))));
+	if (fromDir.y < 0)
+		eulerAngles.x = -eulerAngles.x;
+	//yaw = arc tan(x/z)
+	eulerAngles.y = glm::degrees(atan2(fromDir.x, fromDir.z));
+
+	//roll = 0
+	eulerAngles.z = 0;
+	return eulerAngles;
 }
 
 //view:eyePos

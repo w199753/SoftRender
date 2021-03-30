@@ -10,6 +10,7 @@
 #include "Render/FrameBuffer.h"
 #include "Render/Object.h"
 #include"Shade/PhongShader.h"
+#include"Light/Light.h"
 
 using namespace std;
 using namespace softRD;
@@ -18,7 +19,7 @@ using namespace softRD;
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-glm::vec3 pos = glm::vec3(0, 0, 1);
+glm::vec3 pos = glm::vec3(0, 0, 1.4);
 glm::vec3 look = glm::vec3(0, 0, -1);
 glm::vec3 rot = glm::vec3(0, 0, 0);
 bool addDelta = false;
@@ -88,38 +89,37 @@ void processInput(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
 		addDelta = true;
-		pos.x -= 0.02 * delta;
-		Global::mainCamera->MoveHorizontal(-0.02 * delta);
+		Global::mainCamera->MoveHorizontal(-0.01 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.x += 0.02 * delta;
-		Global::mainCamera->MoveHorizontal(0.02 * delta);
+		Global::mainCamera->MoveHorizontal(0.01 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.z -= 0.02 * delta;
-		Global::mainCamera->MoveForward(0.02 * delta);
+		Global::mainCamera->MoveForward(0.01 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.z += 0.02 * delta;
-		Global::mainCamera->MoveForward(-0.02 * delta);
+		Global::mainCamera->MoveForward(-0.01 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.y -= 0.02 * delta;
-		Global::mainCamera->MoveVertical(-0.02 * delta);
+		Global::mainCamera->MoveVertical(-0.01 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
 		addDelta = true;
 		pos.y += 0.02 * delta;
-		Global::mainCamera->MoveVertical(0.02 * delta);
+		Global::mainCamera->MoveVertical(0.01 * delta);
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_RELEASE &&
 		glfwGetKey(window, GLFW_KEY_Q) == GLFW_RELEASE &&
@@ -194,14 +194,17 @@ int main()
 	bbb.emplace_back();
 	bbb.emplace_back();
 	bbb.emplace_back();
+	
 	//bbb.push_back(BB());
 	//bbb.push_back(BB());
 	//bbb.push_back(BB());
 	//std::unique_ptr<Camera> main = ;
+
+	Global::pointLightList.push_back(make_unique<PointLight>(glm::vec3(0.5,1.5,1.4), 15, glm::vec3(1, 1, 1), 3));
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, static_cast<float>(SCR_WIDTH), static_cast<float>(SCR_HEIGHT));
-	Global::mainCamera->SetTransformParam(pos, pos + look, glm::vec3(0));
-	Global::mainCamera->SetProjectParams(0.6f, 100.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
+	Global::mainCamera->SetTransformParam(pos, glm::vec3(0), glm::vec3(0));
+	Global::mainCamera->SetProjectParams(0.4f, 100.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
 
 	Global::frameBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
 
@@ -215,18 +218,18 @@ int main()
 	std::unique_ptr<Shader> shader = std::make_unique<PhongShader>(block);
 	Material obj_material;
 	obj_material.SetShader(std::move(shader));
-	//Object obj("Model/cube_1.obj",obj_material);
-	//obj.SetScale(0.8, 0.8, 0.3);
-	//obj.SetRotate(0, 10, 0);
-	//obj.SetTranslate(0, -25, -25);
+	Object obj("Model/cube_2.obj",obj_material);
+	obj.SetScale(0.1, 0.1, 0.1);
+	obj.SetRotate(0, 10, 0);
+	obj.SetTranslate(0, 0, 0);
 	//Object obj("Model/face.obj", obj_material);
 	//obj.SetScale(1., 1., 1);
 	//obj.SetRotate(0, 10, 0);
 	//obj.SetTranslate(0, -0.5, -3);
-	Object obj("Model/Scanner.obj", obj_material);
-	obj.SetScale(0.0004, 0.0004, 0.0004);
-	obj.SetRotate(0, 90, 0);
-	obj.SetTranslate(0, -0.5, 0.0+0.45);
+	//Object obj("Model/Scanner.obj", obj_material);
+	//obj.SetScale(0.0004, 0.0004, 0.0004);
+	//obj.SetRotate(0, 90, 0);
+	//obj.SetTranslate(0, -0.5, 0.0+0.45);
 
 	//PropertyBlock block1;
 	//block1.albedo = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR);
