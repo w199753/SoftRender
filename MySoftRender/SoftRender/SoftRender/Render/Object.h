@@ -15,6 +15,12 @@ namespace softRD
 			ObjModelLoader loader(mesh);
 			loader.LoadModelMesh(objPath);
 		}
+
+		Object& operator = (const Object& obj)
+		{
+			//mesh = obj.mesh;
+			//material = obj.material;
+		}
 		~Object() {}
 
 		void SetTranslate(const float x, const float y, const float z)
@@ -40,9 +46,10 @@ namespace softRD
 		//Transform& getTrans()const{return std::move(trans;}
 
 		inline const Mesh& GetMesh()const { return mesh; }
-	private:
+	
 		Mesh mesh;
 		Material& material;
+	private:
 	};
 
 }

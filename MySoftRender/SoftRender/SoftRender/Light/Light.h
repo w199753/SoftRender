@@ -4,6 +4,8 @@
 #include<glm/vec3.hpp>
 #include<glm/vec4.hpp>
 #include"../Math/fMath.h"
+#include"../Render/Object.h"
+#include"../Shade/UnlitShader.h"
 #include"../Render/Transform.hpp"
 namespace softRD
 {
@@ -12,7 +14,10 @@ namespace softRD
 	public:
 		Light(const glm::vec3& pos,float i,const glm::vec3& col)
 			:position(pos), intensity(i), color(col),dirction(glm::vec3(0,0,-1)),trans(std::make_unique<Transform>())
-		{ std::cout << "light" << std::endl; }
+		{ 
+			std::cout << "light" << std::endl;
+			InitLightObj();
+		}
 		virtual ~Light() {}
 
 		glm::vec3 position;
@@ -24,9 +29,20 @@ namespace softRD
 		const glm::vec3& getDirction()const { return dirction; }
 		virtual void setTransform(const glm::vec3& pos, const glm::vec3& rot) = 0;
 		virtual float getAttenuation(const glm::vec3& target) = 0;
-
+		void InitLightObj()
+		{
+			PropertyBlock unlitBlock;
+			std::unique_ptr<Shader> unlitShader = std::make_unique<UnlitShader>(unlitBlock);
+			Material unlit_material;
+			unlit_material.SetColor(glm::vec4(color,1));
+			unlit_material.SetShader(std::move(unlitShader));
+			obj =std::make_unique<Object>("Model/cube_2.obj", unlit_material);
+			obj->SetTranslate(position.x, position.y, position.z);
+			obj->SetScale(0.1, 0.1, 0.1);
+		}
+		std::unique_ptr<Object> obj;
 	private:
-
+		
 	};
 
 	class DirectionLight:public Light
@@ -39,6 +55,9 @@ namespace softRD
 		{
 			position = pos;
 			dirction = fMath::Euler2Dir(rot);
+			obj->SetTranslate(pos.x, pos.y, pos.z);
+			obj->SetRotate(rot.x, rot.y, rot.z);
+			obj->SetScale(0.1, 0.1, 0.1);
 		}
 
 		//平行光设定没有衰减
@@ -80,6 +99,9 @@ namespace softRD
 		{
 			position = pos;
 			dirction = glm::vec3(0);  //无方向
+			obj->SetTranslate(pos.x, pos.y, pos.z);
+			obj->SetRotate(rot.x, rot.y, rot.z);
+			obj->SetScale(0.1, 0.1, 0.1);
 		}
 
 		//衰减：intensity/C+L*dis+E*dis*dis

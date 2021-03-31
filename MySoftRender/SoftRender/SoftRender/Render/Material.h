@@ -52,6 +52,11 @@ namespace softRD
 
 		}
 
+		void SetColor(const glm::vec4& col)
+		{
+			color = col;
+		}
+
 		void SetShader(std::unique_ptr<Shader>& _shader)
 		{
 			shader = std::move(_shader);
@@ -75,9 +80,10 @@ namespace softRD
 					{
 						//cout << "***********" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 						//cout <<"vvvvvvvvv"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
+						o1.color = o2.color = o3.color = color;
 						Global::raster->RasterTriangle(o1, o2, o3);
-						Global::verticesCount +=3/shader->pass.size();
-						Global::triangleCount +=1/shader->pass.size();
+						Global::verticesCount += 3 / shader->pass.size();
+						Global::triangleCount += 1 / shader->pass.size();
 						//auto resList = ;
 						int len = Global::raster->index;
 						//std::cout << len << std::endl;
@@ -95,6 +101,7 @@ namespace softRD
 		std::unique_ptr<Shader> shader;
 	private:
 		ShadingType type = ShadingType::Phong;
+		glm::vec4 color = glm::vec4(1);
 		CullSystem cull;
 
 		bool PreRasterSetting(V2f& o1, V2f& o2, V2f& o3)

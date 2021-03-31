@@ -137,7 +137,7 @@ namespace softRD
 							Vertex vert3;
 							vert3.position = glm::vec4(position[v[3][0]-1], 1);
 							vert3.texcoord = texcoord[v[3][1]-1];
-							vert1.normal = normal[v[3][2]-1];
+							vert1.normal = normal[v[3][2] - 1];
 							mesh.PushIndices(mesh.getVectorVerticesSize());
 							mesh.PushVertex(vert3);
 						}

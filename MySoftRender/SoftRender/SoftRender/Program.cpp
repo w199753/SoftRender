@@ -10,6 +10,7 @@
 #include "Render/FrameBuffer.h"
 #include "Render/Object.h"
 #include"Shade/PhongShader.h"
+#include"Shade/UnlitShader.h"
 #include"Light/Light.h"
 
 using namespace std;
@@ -52,7 +53,7 @@ static void mouse_btn_callback(GLFWwindow* pWindow, int Button, int Action, int 
 			//starty = starty - SCR_HEIGHT;
 			//startx
 			lastX = startx;
-			lastY = SCR_HEIGHT-starty;
+			lastY = SCR_HEIGHT - starty;
 		}
 	}
 }
@@ -79,7 +80,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 void scroll_callback(GLFWwindow* window, double xoffeset, double yoffset)
 {
 	pos.z -= yoffset * 0.5;
-	Global::mainCamera->MoveForward(yoffset*0.5f);
+	Global::mainCamera->MoveForward(yoffset * 0.5f);
 }
 
 void processInput(GLFWwindow* window)
@@ -194,13 +195,18 @@ int main()
 	bbb.emplace_back();
 	bbb.emplace_back();
 	bbb.emplace_back();
-	
+
 	//bbb.push_back(BB());
 	//bbb.push_back(BB());
 	//bbb.push_back(BB());
 	//std::unique_ptr<Camera> main = ;
 
-	Global::pointLightList.push_back(make_unique<PointLight>(glm::vec3(0.5,1.5,1.4), 15, glm::vec3(1, 1, 1), 3));
+	auto pointLight1Col = glm::vec4(1, 1, 1, 1);
+	auto pointLight1 = make_unique<PointLight>(glm::vec3(0.5, 1.5, 1.4), 15, pointLight1Col, 3);
+	pointLight1->obj->material.SetColor(pointLight1Col);
+	Global::pointLightList.push_back(std::move(pointLight1));
+	//Global::pointLightList[0];
+	//cout << " fzy " << Global::pointLightList[0]->obj-> << endl;
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, static_cast<float>(SCR_WIDTH), static_cast<float>(SCR_HEIGHT));
 	Global::mainCamera->SetTransformParam(pos, glm::vec3(0), glm::vec3(0));
@@ -211,14 +217,21 @@ int main()
 	Global::raster = std::make_unique<Rasterization>();
 	Global::raster->SetRasterType(RasterType::Fill);
 
-	PropertyBlock block;
+	PropertyBlock phongBlock;
 	auto txt = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR, true);
 	txt->filterType = FilterType::Bilinear;
-	block.albedo = std::move(txt);
-	std::unique_ptr<Shader> shader = std::make_unique<PhongShader>(block);
-	Material obj_material;
-	obj_material.SetShader(std::move(shader));
-	Object obj("Model/cube_2.obj",obj_material);
+	phongBlock.albedo = std::move(txt);
+	std::unique_ptr<Shader> phongShader = std::make_unique<PhongShader>(phongBlock);
+	Material phong_material;
+	phong_material.SetShader(std::move(phongShader));
+
+	PropertyBlock unlitBlock;
+	std::unique_ptr<Shader> unlitShader = std::make_unique<UnlitShader>(unlitBlock);
+	Material unlit_material;
+	unlit_material.SetShader(std::move(unlitShader));
+
+
+	Object obj("Model/cube_2.obj", unlit_material);
 	obj.SetScale(0.1, 0.1, 0.1);
 	obj.SetRotate(0, 10, 0);
 	obj.SetTranslate(0, 0, 0);
@@ -274,7 +287,7 @@ int main()
 
 	glfwSetMouseButtonCallback(window, mouse_btn_callback);
 	glfwSetCursorPosCallback(window, mouse_callback);
-	
+
 	std::thread showFPS(showfps, window);
 	showFPS.detach();
 	while (!glfwWindowShouldClose(window))
@@ -288,6 +301,10 @@ int main()
 		//	for (int j = 0; j < 200; j++)
 		//		Global::frameBuffer->WriteColor(i,j, glm::vec4(1));
 		//}
+		for (size_t i = 0; i < Global::pointLightList.size(); i++)
+		{
+			Global::pointLightList[i]->obj->RenderObject();
+		}
 		obj.RenderObject();
 		//obj1.RenderObject();
 		//
