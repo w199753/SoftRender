@@ -16,7 +16,7 @@ namespace softRD
 			transform = std::move(_transform);
 		}
 
-		std::unique_ptr<Texture> albedo;
+		std::shared_ptr<Texture> albedo;
 		//后面还有pbr的一坨贴图 metallic,roughness,normal,ao ..
 		std::unique_ptr<Transform> transform;
 	private:

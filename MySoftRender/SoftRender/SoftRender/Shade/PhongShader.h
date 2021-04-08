@@ -43,13 +43,19 @@ namespace softRD
 		glm::vec4 FragmentShader(const V2f& v2f)override
 		{
 			//return glm::vec4(v2f.windowPos.z);
+			glm::vec4 res_Col = glm::vec4(0);
 			glm::vec4 col = block.albedo->Sampler2D(v2f.texcoord);
-			auto L = Global::pointLightList[0]->position - glm::vec3(v2f.worldPos);
-			auto c = Global::pointLightList[0]->color;
-			auto i = Global::pointLightList[0]->intensity;
-			auto a = Global::pointLightList[0]->getAttenuation(v2f.worldPos);
+			for (size_t index = 0; index < Global::pointLightList.size(); index++)
+			{
+				auto L = Global::pointLightList[index]->position - glm::vec3(v2f.worldPos);
+				auto c = Global::pointLightList[index]->color;
+				auto i = Global::pointLightList[index]->intensity;
+				auto a = Global::pointLightList[index]->getAttenuation(v2f.worldPos);
+				res_Col += col * std::max(0.001f, glm::dot(glm::normalize(L), glm::normalize(v2f.normal))) * glm::vec4(c.x, c.y, c.z, 1) * i * a;
+			}
+
 			//std::cout << v2f.worldPos.x<<" "<< v2f.worldPos .y<<" "<< v2f.worldPos .z<<" "<< v2f.worldPos .w<< " " << std::endl;
-			return col*std::max(0.001f,glm::dot(glm::normalize(L),glm::normalize(v2f.normal)))*glm::vec4(c.x,c.y,c.z,1)*i*a;
+			return res_Col;
 			return glm::vec4(0.2, 0.5, 0.8, 1);
 		}
 

@@ -188,6 +188,15 @@ public:
 	~BB() { cout << "NOBB" << endl; }
 };
 
+template<typename T>
+void creataMaterial(Material& mat)
+{
+	PropertyBlock* unlitBlock2 = new PropertyBlock;
+	std::unique_ptr<Shader> unlitShader2 = std::make_unique<T>(*unlitBlock2);
+	mat.SetShader(std::move(unlitShader2));
+}
+
+
 int main()
 {
 	vector<BB> bbb;
@@ -199,14 +208,7 @@ int main()
 	//bbb.push_back(BB());
 	//bbb.push_back(BB());
 	//bbb.push_back(BB());
-	//std::unique_ptr<Camera> main = ;
 
-	auto pointLight1Col = glm::vec4(1, 1, 1, 1);
-	auto pointLight1 = make_unique<PointLight>(glm::vec3(0.5, 1.5, 1.4), 15, pointLight1Col, 3);
-	pointLight1->obj->material.SetColor(pointLight1Col);
-	Global::pointLightList.push_back(std::move(pointLight1));
-	//Global::pointLightList[0];
-	//cout << " fzy " << Global::pointLightList[0]->obj-> << endl;
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, static_cast<float>(SCR_WIDTH), static_cast<float>(SCR_HEIGHT));
 	Global::mainCamera->SetTransformParam(pos, glm::vec3(0), glm::vec3(0));
@@ -217,32 +219,39 @@ int main()
 	Global::raster = std::make_unique<Rasterization>();
 	Global::raster->SetRasterType(RasterType::Fill);
 
-	PropertyBlock phongBlock;
-	auto txt = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR, true);
+
+	auto txt = std::make_shared<Texture>("Model/textures/Albedo.png", TextureType::LDR, true);
 	txt->filterType = FilterType::Bilinear;
-	phongBlock.albedo = std::move(txt);
-	std::unique_ptr<Shader> phongShader = std::make_unique<PhongShader>(phongBlock);
 	Material phong_material;
-	phong_material.SetShader(std::move(phongShader));
+	Material phong_material2;
+	creataMaterial<PhongShader>(phong_material);
+	creataMaterial<PhongShader>(phong_material2);
+	phong_material.shader->block.albedo = txt;
+	phong_material2.shader->block.albedo = txt;
 
-	PropertyBlock unlitBlock;
-	std::unique_ptr<Shader> unlitShader = std::make_unique<UnlitShader>(unlitBlock);
-	Material unlit_material;
-	unlit_material.SetShader(std::move(unlitShader));
+	Material unlit_material1;
+	creataMaterial<UnlitShader>(unlit_material1);
+
+	Material unlit_material2;
+	creataMaterial<UnlitShader>(unlit_material2);
 
 
-	Object obj("Model/cube_2.obj", unlit_material);
-	obj.SetScale(0.1, 0.1, 0.1);
-	obj.SetRotate(0, 10, 0);
-	obj.SetTranslate(0, 0, 0);
-	//Object obj("Model/face.obj", obj_material);
-	//obj.SetScale(1., 1., 1);
+	//Object obj("Model/cube_2.obj", unlit_material);
+	//obj.SetScale(0.1, 0.1, 0.1);
 	//obj.SetRotate(0, 10, 0);
-	//obj.SetTranslate(0, -0.5, -3);
-	//Object obj("Model/Scanner.obj", obj_material);
-	//obj.SetScale(0.0004, 0.0004, 0.0004);
-	//obj.SetRotate(0, 90, 0);
-	//obj.SetTranslate(0, -0.5, 0.0+0.45);
+	//obj.SetTranslate(0, 0, 0);
+
+	auto obj_light_1 = std::make_unique<Object>("Model/cube_2.obj", unlit_material1);
+	auto obj_light_2 = std::make_unique<Object>("Model/cube_2.obj", unlit_material2);
+
+	Object obj1("Model/face.obj", phong_material2);
+	obj1.SetScale(0.6, 0.6, 0.6);
+	obj1.SetRotate(0, 10, 0);
+	obj1.SetTranslate(0, -0.5, 0);
+	Object obj("Model/Scanner.obj", phong_material);
+	obj.SetScale(0.0004, 0.0004, 0.0004);
+	obj.SetRotate(0, 90, 0);
+	obj.SetTranslate(0, -0.5, 0.0+0.45);
 
 	//PropertyBlock block1;
 	//block1.albedo = std::make_unique<Texture>("Model/textures/Albedo.png", TextureType::LDR);
@@ -253,11 +262,17 @@ int main()
 	//obj1.SetScale(1, 1, 0.9);
 	//obj1.SetTranslate(0.5, 0, 0);
 
+	//obj.RenderObject();
 
 
-	//Test* tt = new Test();
-	//change(tt,200);
-	//std::cout << tt->aaa << std::endl;
+	auto pointLight1 = make_unique<PointLight>(glm::vec3(0, 0.0, 0.74), 1.2, glm::vec4(1, 0.8, 1, 1),std::move(obj_light_1), 1.3);
+	pointLight1->obj->material.SetColor(glm::vec4(1, 0.8, 1, 1));
+	Global::pointLightList.push_back(std::move(pointLight1));
+
+	auto pointLight2 = make_unique<PointLight>(glm::vec3(0.3, 0.3, 0.85), 1.1, glm::vec4(0.7, 1, 1, 1), std::move(obj_light_2), 1.5);
+	pointLight2->obj->material.SetColor(glm::vec4(0.7, 1, 1, 1));
+	Global::pointLightList.push_back(std::move(pointLight2));
+
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -301,12 +316,13 @@ int main()
 		//	for (int j = 0; j < 200; j++)
 		//		Global::frameBuffer->WriteColor(i,j, glm::vec4(1));
 		//}
+		
 		for (size_t i = 0; i < Global::pointLightList.size(); i++)
 		{
 			Global::pointLightList[i]->obj->RenderObject();
 		}
 		obj.RenderObject();
-		//obj1.RenderObject();
+		obj1.RenderObject();
 		//
 		////
 		////glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

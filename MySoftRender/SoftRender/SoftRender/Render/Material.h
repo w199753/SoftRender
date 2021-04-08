@@ -24,6 +24,7 @@ namespace softRD
 	public:
 		int sortingOrder = 0;
 		Material() {}
+
 		Material(ShadingType _type, int _sortingOrder = 0)
 		{
 			type = _type;
@@ -72,10 +73,13 @@ namespace softRD
 			{
 				for (int s = 0; s < shader->pass.size(); s++)
 				{
+					//continue;
 					V2f o1 = shader->pass[s].vertexShader(stream[i]->v2());
+					
 					V2f o2 = shader->pass[s].vertexShader(stream[i]->v1());
 					V2f o3 = shader->pass[s].vertexShader(stream[i]->v0());
 					//cout <<"xxxxxx"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
+					
 					if (PreRasterSetting(o1, o2, o3))
 					{
 						//cout << "***********" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;

@@ -12,8 +12,8 @@ namespace softRD
 	class Light
 	{
 	public:
-		Light(const glm::vec3& pos,float i,const glm::vec3& col)
-			:position(pos), intensity(i), color(col),dirction(glm::vec3(0,0,-1)),trans(std::make_unique<Transform>())
+		Light(const glm::vec3& pos,float i,const glm::vec3& col,std::unique_ptr<Object> _obj)
+			:position(pos), intensity(i), color(col),dirction(glm::vec3(0,0,-1)),trans(std::make_unique<Transform>()),obj(std::move(_obj))
 		{ 
 			std::cout << "light" << std::endl;
 			InitLightObj();
@@ -31,14 +31,9 @@ namespace softRD
 		virtual float getAttenuation(const glm::vec3& target) = 0;
 		void InitLightObj()
 		{
-			PropertyBlock unlitBlock;
-			std::unique_ptr<Shader> unlitShader = std::make_unique<UnlitShader>(unlitBlock);
-			Material unlit_material;
-			unlit_material.SetColor(glm::vec4(color,1));
-			unlit_material.SetShader(std::move(unlitShader));
-			obj =std::make_unique<Object>("Model/cube_2.obj", unlit_material);
-			obj->SetTranslate(position.x, position.y, position.z);
-			obj->SetScale(0.1, 0.1, 0.1);
+			obj->material.SetColor(glm::vec4(color,1));
+			obj->SetTranslate(position.x,position.y,position.z);
+			obj->SetScale(0.01, 0.01, 0.01);
 		}
 		std::unique_ptr<Object> obj;
 	private:
@@ -78,7 +73,7 @@ namespace softRD
 		float _c=1.0f, _l, _e;
 		float m_range;
 	public:
-		PointLight(const glm::vec3& pos, float i, const glm::vec3& col,float range):Light(pos,i,col),m_range(range) {
+		PointLight(const glm::vec3& pos, float i, const glm::vec3& col, std::unique_ptr<Object> _obj,float range):Light(pos,i,col,std::move(_obj)),m_range(range) {
 			std::cout << "Pointlight"<<position.x<<" "<<position.y <<position.z<< std::endl;
 			SetRange(range);
 		}
