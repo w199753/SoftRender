@@ -191,9 +191,9 @@ public:
 template<typename T>
 void creataMaterial(Material& mat)
 {
-	PropertyBlock* unlitBlock2 = new PropertyBlock;
-	std::unique_ptr<Shader> unlitShader2 = std::make_unique<T>(*unlitBlock2);
-	mat.SetShader(std::move(unlitShader2));
+	PropertyBlock* block = new PropertyBlock;    //没错，懒得释放指针了
+	std::unique_ptr<Shader> shader = std::make_unique<T>(*block);
+	mat.SetShader(std::move(shader));
 }
 
 
@@ -235,6 +235,8 @@ int main()
 	Material unlit_material2;
 	creataMaterial<UnlitShader>(unlit_material2);
 
+	Material unlit_material3;
+	creataMaterial<UnlitShader>(unlit_material3);
 
 	//Object obj("Model/cube_2.obj", unlit_material);
 	//obj.SetScale(0.1, 0.1, 0.1);
@@ -243,6 +245,7 @@ int main()
 
 	auto obj_light_1 = std::make_unique<Object>("Model/cube_2.obj", unlit_material1);
 	auto obj_light_2 = std::make_unique<Object>("Model/cube_2.obj", unlit_material2);
+	auto obj_light_3 = std::make_unique<Object>("Model/face.obj", unlit_material3);
 
 	Object obj1("Model/face.obj", phong_material2);
 	obj1.SetScale(0.6, 0.6, 0.6);
@@ -264,14 +267,18 @@ int main()
 
 	//obj.RenderObject();
 
-
-	auto pointLight1 = make_unique<PointLight>(glm::vec3(0, 0.0, 0.74), 1.2, glm::vec4(1, 0.8, 1, 1),std::move(obj_light_1), 1.3);
-	pointLight1->obj->material.SetColor(glm::vec4(1, 0.8, 1, 1));
+	//-----------------------------------------------------------------------------创建灯光
+	auto pointLight1 = make_unique<PointLight>(glm::vec3(0, 0.0, 0.74), 2.8, glm::vec4(1, 0.8, 1, 1),std::move(obj_light_1), 0.3);
 	Global::pointLightList.push_back(std::move(pointLight1));
 
 	auto pointLight2 = make_unique<PointLight>(glm::vec3(0.3, 0.3, 0.85), 1.1, glm::vec4(0.7, 1, 1, 1), std::move(obj_light_2), 1.5);
-	pointLight2->obj->material.SetColor(glm::vec4(0.7, 1, 1, 1));
 	Global::pointLightList.push_back(std::move(pointLight2));
+
+	auto dirLight1 = make_unique<DirectionLight>(glm::vec3(1, 1, 1), 1, glm::vec4(1, 1, 1, 1), std::move(obj_light_3));
+	dirLight1->setTransform(glm::vec3(1, 1, 1), glm::vec3(0,70,0));
+	Global::dirLightList.push_back(std::move(dirLight1));
+	//----------------------------------------------------------------------------
+
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -320,6 +327,10 @@ int main()
 		for (size_t i = 0; i < Global::pointLightList.size(); i++)
 		{
 			Global::pointLightList[i]->obj->RenderObject();
+		}
+		for (int i = 0; i < Global::dirLightList.size(); i++)
+		{
+			Global::dirLightList[i]->obj->RenderObject();
 		}
 		obj.RenderObject();
 		obj1.RenderObject();

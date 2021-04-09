@@ -94,7 +94,7 @@ namespace softRD
 							float divZ = (1.0f / o.Z);
 							o.worldPos *= divZ;
 							o.normal *= divZ;
-							o.color *= divZ;
+							//o.color *= divZ;
 							o.texcoord *= divZ;
 
 							resList[index].y = j;

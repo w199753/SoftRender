@@ -43,7 +43,10 @@ namespace softRD
 	class DirectionLight:public Light
 	{
 	public:
-		using Light::Light;
+		//using Light::Light;
+		DirectionLight(const glm::vec3& pos, float i, const glm::vec3& col, std::unique_ptr<Object> _obj) :Light(pos, i, col, std::move(_obj)) {
+			//setTransform(pos, rot);
+		}
 		~DirectionLight() {}
 
 		void setTransform(const glm::vec3& pos, const glm::vec3& rot) override
@@ -53,6 +56,7 @@ namespace softRD
 			obj->SetTranslate(pos.x, pos.y, pos.z);
 			obj->SetRotate(rot.x, rot.y, rot.z);
 			obj->SetScale(0.1, 0.1, 0.1);
+			obj->material.SetColor(glm::vec4(color, 1));
 		}
 
 		//平行光设定没有衰减
@@ -76,6 +80,7 @@ namespace softRD
 		PointLight(const glm::vec3& pos, float i, const glm::vec3& col, std::unique_ptr<Object> _obj,float range):Light(pos,i,col,std::move(_obj)),m_range(range) {
 			std::cout << "Pointlight"<<position.x<<" "<<position.y <<position.z<< std::endl;
 			SetRange(range);
+			//setTransform(pos, rot);
 		}
 
 		void SetRange(float range)
@@ -95,7 +100,7 @@ namespace softRD
 			position = pos;
 			dirction = glm::vec3(0);  //无方向
 			obj->SetTranslate(pos.x, pos.y, pos.z);
-			obj->SetRotate(rot.x, rot.y, rot.z);
+			obj->SetRotate(dirction.x, dirction.y, dirction.z);
 			obj->SetScale(0.1, 0.1, 0.1);
 		}
 

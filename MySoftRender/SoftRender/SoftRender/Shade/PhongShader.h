@@ -45,13 +45,23 @@ namespace softRD
 			//return glm::vec4(v2f.windowPos.z);
 			glm::vec4 res_Col = glm::vec4(0);
 			glm::vec4 col = block.albedo->Sampler2D(v2f.texcoord);
+
+			auto N = glm::normalize(v2f.normal);
 			for (size_t index = 0; index < Global::pointLightList.size(); index++)
 			{
-				auto L = Global::pointLightList[index]->position - glm::vec3(v2f.worldPos);
+				auto L = glm::normalize(Global::pointLightList[index]->position - glm::vec3(v2f.worldPos));
 				auto c = Global::pointLightList[index]->color;
 				auto i = Global::pointLightList[index]->intensity;
 				auto a = Global::pointLightList[index]->getAttenuation(v2f.worldPos);
-				res_Col += col * std::max(0.001f, glm::dot(glm::normalize(L), glm::normalize(v2f.normal))) * glm::vec4(c.x, c.y, c.z, 1) * i * a;
+				res_Col += col * std::max(0.001f, glm::dot(L,N)) * glm::vec4(c, 1) * i * a;
+			}
+			for (int index = 0; index < Global::dirLightList.size(); index++)
+			{
+				auto L = glm::normalize(Global::dirLightList[index]->dirction);
+				auto i = Global::dirLightList[index]->intensity;
+				auto c = Global::dirLightList[index]->color;
+				auto a = Global::dirLightList[index]->getAttenuation(v2f.worldPos);
+				res_Col += col * std::max(0.001f, glm::dot(L,N)) * glm::vec4(c, 1) * i * a;
 			}
 
 			//std::cout << v2f.worldPos.x<<" "<< v2f.worldPos .y<<" "<< v2f.worldPos .z<<" "<< v2f.worldPos .w<< " " << std::endl;

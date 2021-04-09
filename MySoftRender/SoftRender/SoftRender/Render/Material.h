@@ -143,7 +143,7 @@ namespace softRD
 
 			//--透视矫正插值:使用w还是使用z关系不大，因为可以推出用1/z做矫正，z和w为线性关系，后来业界统一为用w
 			v.normal *= v.Z;
-			v.color *= v.Z;
+			//v.color *= v.Z;
 			v.texcoord *= v.Z;
 			v.worldPos *= v.Z;
 		}

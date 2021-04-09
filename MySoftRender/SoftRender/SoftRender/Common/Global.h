@@ -9,7 +9,7 @@ namespace softRD
 	class Rasterization;
 	class FrameBuffer;
 	class PointLight;
-	//class DirectionLight;
+	class DirectionLight;
 	class Global
 	{
 	public:
@@ -21,6 +21,7 @@ namespace softRD
 		static std::unique_ptr<Camera> mainCamera;
 		static std::unique_ptr<FrameBuffer> frameBuffer;
 		static std::vector<std::unique_ptr<PointLight>> pointLightList;
+		static std::vector<std::unique_ptr<DirectionLight>> dirLightList;
 		//static std::vector<DirectionLight> dirLightList;
 		static float triangleCount;
 		static float verticesCount;

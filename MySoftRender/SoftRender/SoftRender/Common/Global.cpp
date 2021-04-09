@@ -14,6 +14,7 @@ std::unique_ptr<Camera> Global::mainCamera = nullptr;
 std::unique_ptr<Rasterization> Global::raster = nullptr;
 std::unique_ptr<FrameBuffer> Global::frameBuffer = nullptr;
 std::vector<std::unique_ptr<PointLight>> Global::pointLightList;
+std::vector<std::unique_ptr<DirectionLight>> Global::dirLightList;
 float Global::triangleCount = 0;
 float Global::verticesCount = 0;
 //void Global::SetMainCamera(std::unique_ptr<Camera>_main)
