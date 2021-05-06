@@ -11,7 +11,17 @@
 #include "Render/Object.h"
 #include"Shade/PhongShader.h"
 #include"Shade/UnlitShader.h"
+#include"Shade/SkyBoxPreCompute.h"
+#include"Shade/SkyboxShader.h"
 #include"Light/Light.h"
+
+#include "stb_image.h"
+
+#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+#endif // !STB_IMAGE_WRITE_IMPLEMENTATION
+
+
 
 using namespace std;
 using namespace softRD;
@@ -196,9 +206,15 @@ void creataMaterial(Material& mat)
 	mat.SetShader(std::move(shader));
 }
 
+void PreCompute()
+{
+
+}
+
 
 int main()
 {
+	PreCompute();
 	vector<BB> bbb;
 	bbb.reserve(3);
 	bbb.emplace_back();
@@ -279,6 +295,26 @@ int main()
 	Global::dirLightList.push_back(std::move(dirLight1));
 	//----------------------------------------------------------------------------
 
+	//precompute skybox
+	Material skyPrecompute;
+	creataMaterial<SkyBoxPreCompute>(skyPrecompute);
+	auto srcTxt = std::make_shared<Texture>("Model/textures/Road.hdr", TextureType::HDR, false);
+	skyPrecompute.shader->block.albedo = srcTxt;
+	auto preSkyObj = std::make_unique<Object>("Model/cube_2.obj", skyPrecompute);
+	preSkyObj->SetScale(0.1, 0.1, 0.1);
+	preSkyObj->SetRotate(0, 10, 0);
+	preSkyObj->SetTranslate(0, 0, 0);
+
+	//drawSkybox:
+	Material skyboxMat(ShadingType::Skybox);
+	creataMaterial<SkyboxShader>(skyboxMat);
+	auto skyboxTxt = std::make_shared<Texture3D>("Model/textures/valley_skybox.hdr");
+	skyboxMat.shader->block.skybox = skyboxTxt;
+	auto skyboxObj = std::make_unique<Object>("Model/cube_2.obj", skyboxMat);
+	skyboxObj->SetScale(0.1, 0.1, 0.1);
+	skyboxObj->SetRotate(0, 0, 0);
+	skyboxObj->SetTranslate(0, 0, 0);
+
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -324,6 +360,8 @@ int main()
 		//		Global::frameBuffer->WriteColor(i,j, glm::vec4(1));
 		//}
 		
+		skyboxObj->RenderObject();
+
 		for (size_t i = 0; i < Global::pointLightList.size(); i++)
 		{
 			Global::pointLightList[i]->obj->RenderObject();
@@ -332,8 +370,10 @@ int main()
 		{
 			Global::dirLightList[i]->obj->RenderObject();
 		}
-		obj.RenderObject();
-		obj1.RenderObject();
+		preSkyObj->RenderObject();
+		
+		//obj.RenderObject();
+		//obj1.RenderObject();
 		//
 		////
 		////glClearColor(0.2f, 0.3f, 0.3f, 1.0f);

@@ -5,6 +5,7 @@
 #include<glm/glm.hpp>
 #include<glm/common.hpp>
 #include<glm/ext.hpp>
+using namespace std;
 namespace softRD
 {
 	enum class FilterType
@@ -30,18 +31,25 @@ namespace softRD
 
 		Texture::Texture(const Texture& t);
 
+		Texture::Texture(int width, int height, int channel,TextureType txtType);
+
 		Texture& Texture::operator = (const Texture& t);
 
 		glm::vec4 Sampler2D(const glm::vec2& uv);
 
 		template<typename T>
-		glm::vec4 internal_Sampler2D(const glm::vec2& uv, glm::vec4& res, const T* p)
+		glm::vec4 internal_Sampler2D(const glm::vec2& uv, glm::vec4& res, const T p)
 		{
 			int width, height;
 			if (isGenMipmap)
 			{
 				width = mipmapData[0]->width;
 				height = mipmapData[0]->height;
+			}
+			else
+			{
+				width = this->width;
+				height = this->height;
 			}
 			if (filterType == FilterType::Point)
 			{
@@ -167,10 +175,36 @@ namespace softRD
 
 	private:
 		std::vector<std::unique_ptr<Texture>> mipmapData;
-		void GenMipmap()
-		{
+		void GenMipmap();
+	};
 
-		}
+	class Texture3D
+	{
+	public:
+
+		enum FaceDir {
+			FRONT,
+			BACK,
+			LEFT,
+			RIGHT,
+			TOP,
+			BOTTOM
+		};
+
+		Texture3D(const string& path);
+		Texture3D(const Texture3D& texture);
+		Texture3D& operator = (const Texture3D& texture);
+
+		glm::vec4 SamplerCube(const glm::vec3& v);
+
+		int width;
+		int height;
+		int channel;
+		//unsigned char* data;
+
+		//0:front    1:back    2:left    3:right    4:top    5:bottom
+		int faceDir[6];
+		vector<Texture*> faces;
 	};
 
 }

@@ -23,6 +23,7 @@ namespace softRD
 	{
 	public:
 		int sortingOrder = 0;
+		bool cullfront = false;
 		Material() {}
 
 		Material(ShadingType _type, int _sortingOrder = 0)
@@ -40,6 +41,7 @@ namespace softRD
 			case softRD::ShadingType::PBR:
 				break;
 			case softRD::ShadingType::Skybox:
+				cullfront = true;
 				break;
 			default:
 				break;
@@ -121,7 +123,7 @@ namespace softRD
 			PerspectiveDivision(o2);
 			PerspectiveDivision(o3);
 
-			if (cull.FaceCull(false, o1, o2, o3))
+			if (cull.FaceCull(cullfront, o1, o2, o3))
 			{
 				return false;
 			}

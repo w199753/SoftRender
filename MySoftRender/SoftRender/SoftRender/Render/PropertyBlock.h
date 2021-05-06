@@ -18,6 +18,7 @@ namespace softRD
 
 		std::shared_ptr<Texture> albedo;
 		//后面还有pbr的一坨贴图 metallic,roughness,normal,ao ..
+		std::shared_ptr<Texture3D> skybox;
 		std::unique_ptr<Transform> transform;
 	private:
 
