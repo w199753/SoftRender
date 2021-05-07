@@ -45,7 +45,7 @@ namespace softRD
 			type = _type;
 		}
 		int index = 0;
-		void RasterTriangle(const V2f& o1, const V2f& o2, const V2f& o3)
+		void RasterTriangle(const V2f& o1, const V2f& o2, const V2f& o3,bool needDepthTest)
 		{
 			index = 0;
 			if ((type & RasterType::Line) == RasterType::Line)
@@ -56,11 +56,11 @@ namespace softRD
 			}
 			if ((type & RasterType::Fill) == RasterType::Fill)
 			{
-				RasterFill(o1, o2, o3);
+				RasterFill(o1, o2, o3, needDepthTest);
 			}
 		}
 
-		void RasterFill(const V2f& o1, const V2f& o2, const V2f& o3)
+		void RasterFill(const V2f& o1, const V2f& o2, const V2f& o3,bool needDepthTest)
 		{
 			int x1, y1, x2, y2;
 			GetBoundBox(o1.windowPos, o2.windowPos, o3.windowPos, x1, y1, x2, y2);
@@ -82,27 +82,55 @@ namespace softRD
 						float rB = (-(i - o3.windowPos.x) * (o1.windowPos.y - o3.windowPos.y) + (j - o3.windowPos.y) * (o1.windowPos.x - o3.windowPos.x)) / (-(o2.windowPos.x - o3.windowPos.x) * (o1.windowPos.y - o3.windowPos.y) + (o2.windowPos.y - o3.windowPos.y) * (o1.windowPos.x - o3.windowPos.x));
 						float rC = 1.0f - rA - rB;
 						float _z = o1.windowPos.z * rA + o2.windowPos.z * rB + o3.windowPos.z * rC;
-						if (_z < Global::frameBuffer->GetDepth(i, j))
+						if (needDepthTest==false)
 						{
-							Global::frameBuffer->WriteDepth(i, j, _z);
-							V2f o((o1.worldPos * rA + o2.worldPos * rB + o3.worldPos * rC),
-								(o1.windowPos * rA + o2.windowPos * rB + o3.windowPos * rC),
-								(o1.color * rA + o2.color * rB + o3.color * rC),
-								(o1.normal * rA + o2.normal * rB + o3.normal * rC),
-								(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
-								(o1.Z * rA + o2.Z * rB + o3.Z * rC));
-							float divZ = (1.0f / o.Z);
-							o.worldPos *= divZ;
-							o.normal *= divZ;
-							//o.color *= divZ;
-							o.texcoord *= divZ;
+							if (_z <= Global::frameBuffer->GetDepth(i, j))
+							{
+								Global::frameBuffer->WriteDepth(i, j, 1);
+								V2f o((o1.worldPos * rA + o2.worldPos * rB + o3.worldPos * rC),
+									(glm::vec4(glm::vec3(o1.windowPos * rA + o2.windowPos * rB + o3.windowPos * rC),1)),
+									(o1.color * rA + o2.color * rB + o3.color * rC),
+									(o1.normal * rA + o2.normal * rB + o3.normal * rC),
+									(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
+									(o1.Z * rA + o2.Z * rB + o3.Z * rC));
+								float divZ = (1.0f / o.Z);
+								//o.worldPos *= divZ;
+								o.normal *= divZ;
+								//o.color *= divZ;
+								o.texcoord *= divZ;
 
-							resList[index].y = j;
-							resList[index].x = i;
-							resList[index].o = o;
-							index++;
+								resList[index].y = j;
+								resList[index].x = i;
+								resList[index].o = o;
+								index++;
+							}
 
 						}
+						else
+						{
+							if (_z < Global::frameBuffer->GetDepth(i, j))
+							{
+								Global::frameBuffer->WriteDepth(i, j, _z);
+								V2f o((o1.worldPos * rA + o2.worldPos * rB + o3.worldPos * rC),
+									(o1.windowPos * rA + o2.windowPos * rB + o3.windowPos * rC),
+									(o1.color * rA + o2.color * rB + o3.color * rC),
+									(o1.normal * rA + o2.normal * rB + o3.normal * rC),
+									(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
+									(o1.Z * rA + o2.Z * rB + o3.Z * rC));
+								float divZ = (1.0f / o.Z);
+								o.worldPos *= divZ;
+								o.normal *= divZ;
+								//o.color *= divZ;
+								o.texcoord *= divZ;
+
+								resList[index].y = j;
+								resList[index].x = i;
+								resList[index].o = o;
+								index++;
+
+							}
+						}
+
 
 					}
 
@@ -185,7 +213,7 @@ namespace softRD
 			y2 = std::max(std::max(o1.y, o2.y), o3.y);
 		}
 
-		raster_res resList[400000];
+		raster_res resList[490000];
 	private:
 
 		RasterType type = RasterType::Fill;

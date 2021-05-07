@@ -228,7 +228,7 @@ int main()
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, static_cast<float>(SCR_WIDTH), static_cast<float>(SCR_HEIGHT));
 	Global::mainCamera->SetTransformParam(pos, glm::vec3(0), glm::vec3(0));
-	Global::mainCamera->SetProjectParams(0.4f, 100.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
+	Global::mainCamera->SetProjectParams(0.4f, 1000.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
 
 	Global::frameBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
 
@@ -300,7 +300,8 @@ int main()
 	creataMaterial<SkyBoxPreCompute>(skyPrecompute);
 	auto srcTxt = std::make_shared<Texture>("Model/textures/Road.hdr", TextureType::HDR, false);
 	skyPrecompute.shader->block.albedo = srcTxt;
-	auto preSkyObj = std::make_unique<Object>("Model/cube_2.obj", skyPrecompute);
+	//auto preSkyObj = std::make_unique<Object>("Model/cube_2.obj", skyPrecompute);
+	auto preSkyObj = std::make_unique<Object>(2, skyPrecompute);
 	preSkyObj->SetScale(0.1, 0.1, 0.1);
 	preSkyObj->SetRotate(0, 10, 0);
 	preSkyObj->SetTranslate(0, 0, 0);
@@ -310,8 +311,8 @@ int main()
 	creataMaterial<SkyboxShader>(skyboxMat);
 	auto skyboxTxt = std::make_shared<Texture3D>("Model/textures/valley_skybox.hdr");
 	skyboxMat.shader->block.skybox = skyboxTxt;
-	auto skyboxObj = std::make_unique<Object>("Model/cube_2.obj", skyboxMat);
-	skyboxObj->SetScale(0.1, 0.1, 0.1);
+	auto skyboxObj = std::make_unique<Object>(2, skyboxMat);
+	skyboxObj->SetScale(10, 10, 10);
 	skyboxObj->SetRotate(0, 0, 0);
 	skyboxObj->SetTranslate(0, 0, 0);
 

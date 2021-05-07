@@ -37,6 +37,7 @@ namespace softRD
 			}
 		}
 
+
 		inline int getVectorVerticesSize() const { return Vertices.size(); }
 
 		inline void setVerticesCount(int c) { verticesCount = c; }

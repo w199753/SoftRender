@@ -24,6 +24,7 @@ namespace softRD
 	public:
 		int sortingOrder = 0;
 		bool cullfront = false;
+		bool needDepthTest = true;
 		Material() {}
 
 		Material(ShadingType _type, int _sortingOrder = 0)
@@ -41,6 +42,7 @@ namespace softRD
 			case softRD::ShadingType::PBR:
 				break;
 			case softRD::ShadingType::Skybox:
+				needDepthTest = false;
 				cullfront = true;
 				break;
 			default:
@@ -87,7 +89,7 @@ namespace softRD
 						//cout << "***********" << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 						//cout <<"vvvvvvvvv"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
 						o1.color = o2.color = o3.color = color;
-						Global::raster->RasterTriangle(o1, o2, o3);
+						Global::raster->RasterTriangle(o1, o2, o3,needDepthTest);
 						Global::verticesCount += 3 / shader->pass.size();
 						Global::triangleCount += 1 / shader->pass.size();
 						//auto resList = ;
@@ -123,6 +125,7 @@ namespace softRD
 			PerspectiveDivision(o2);
 			PerspectiveDivision(o3);
 
+			
 			if (cull.FaceCull(cullfront, o1, o2, o3))
 			{
 				return false;

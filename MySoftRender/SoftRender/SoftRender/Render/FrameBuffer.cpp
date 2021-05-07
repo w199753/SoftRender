@@ -21,7 +21,7 @@ void FrameBuffer::ClearBuffer(BuffersType type)
 	}
 	if ((type & BuffersType::DEPTH) == BuffersType::DEPTH)
 	{
-		std::fill(depthBuffer.begin(), depthBuffer.end(), std::numeric_limits<float>::infinity());
+		std::fill(depthBuffer.begin(), depthBuffer.end(), 1);
 	}
 }
 

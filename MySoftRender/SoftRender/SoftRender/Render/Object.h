@@ -16,6 +16,25 @@ namespace softRD
 			loader.LoadModelMesh(objPath);
 		}
 
+		Object(int obj, Material& _material) :material(_material)
+		{
+			ObjModelLoader loader(mesh);
+			glm::vec3 center(0);
+			float radius = 0.5;
+			if (obj == 1) //panel
+			{
+				loader.CreatePanel(center + glm::vec3(-radius, radius, radius),
+					center + glm::vec3(-radius, -radius, radius),
+					center + glm::vec3(radius, -radius, radius),
+					center + glm::vec3(radius, radius, radius),
+					glm::vec3(0, 0, 1));
+			}
+			else if (obj == 2)
+			{
+				loader.CreateBox(center, radius);
+			}
+		}
+
 		Object& operator = (const Object& obj)
 		{
 			//mesh = obj.mesh;

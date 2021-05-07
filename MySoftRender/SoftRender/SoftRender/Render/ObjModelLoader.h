@@ -152,6 +152,77 @@ namespace softRD
 			return mesh;
 		}
 
+		Mesh& CreatePanel(const glm::vec3& leftTop,
+			const glm::vec3& leftBottom,
+			const glm::vec3& rightBottom,
+			const glm::vec3& rightTop,
+			const glm::vec3& normal)
+		{
+			Vertex v1,v2,v3,v4;
+			v1.position = glm::vec4(leftTop, 1);
+			v2.position = glm::vec4(rightTop, 1);
+			v3.position = glm::vec4(rightBottom, 1);
+			v4.position = glm::vec4(leftBottom, 1);
+			mesh.PushIndices(mesh.getVectorVerticesSize());
+			mesh.PushVertex(v1);
+			mesh.PushIndices(mesh.getVectorVerticesSize());
+			mesh.PushVertex(v3);
+			mesh.PushIndices(mesh.getVectorVerticesSize());
+			mesh.PushVertex(v2);
+			mesh.PushIndices(mesh.getVectorVerticesSize());
+			mesh.PushVertex(v1);
+			mesh.PushIndices(mesh.getVectorVerticesSize());
+			mesh.PushVertex(v4);
+			mesh.PushIndices(mesh.getVectorVerticesSize());
+			mesh.PushVertex(v3);
+			mesh.BuildTriangleStream();
+			return mesh;
+		}
+
+		Mesh& CreateBox(const glm::vec3 & center,const float radius)
+		{
+			CreatePanel(center + glm::vec3(-radius, radius, radius),
+				center + glm::vec3(-radius, -radius, radius),
+				center + glm::vec3(radius, -radius, radius),
+				center + glm::vec3(radius, radius, radius),
+				glm::vec3(0, 0, 1));
+
+			CreatePanel(center + glm::vec3(radius, radius, -radius),
+				center + glm::vec3(radius, -radius, -radius),
+				center + glm::vec3(-radius, -radius, -radius),
+				center + glm::vec3(-radius, radius, -radius),
+				glm::vec3(0, 0, -1)
+			);
+
+			CreatePanel(center + glm::vec3(-radius, radius, -radius),
+				center + glm::vec3(-radius, -radius, -radius),
+				center + glm::vec3(-radius, -radius, radius),
+				center + glm::vec3(-radius, radius, radius),
+				glm::vec3(-1, 0, 0)
+			);
+
+			CreatePanel(center + glm::vec3(radius, radius, radius),
+				center + glm::vec3(radius, -radius, radius),
+				center + glm::vec3(radius, -radius, -radius),
+				center + glm::vec3(radius, radius, -radius),
+				glm::vec3(1, 0, 0)
+			);
+
+			CreatePanel(center + glm::vec3(-radius, radius, -radius),
+				center + glm::vec3(-radius, radius, radius),
+				center + glm::vec3(radius, radius, radius),
+				center + glm::vec3(radius, radius, -radius),
+				glm::vec3(0, 1, 0)
+			);
+
+			CreatePanel(center + glm::vec3(-radius, -radius, radius),
+				center + glm::vec3(-radius, -radius, -radius),
+				center + glm::vec3(radius, -radius, -radius),
+				center + glm::vec3(radius, -radius, radius),
+				glm::vec3(0, -1, 0)
+			);
+			return mesh;
+		}
 	private:
 		Mesh& mesh;
 	};

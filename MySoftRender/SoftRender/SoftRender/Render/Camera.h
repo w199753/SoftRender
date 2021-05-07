@@ -28,7 +28,7 @@ namespace softRD
 			projectMatrix[2][2] = -(_far + _near) / (_far - _near);
 			projectMatrix[2][3] = -1.f;
 			projectMatrix[3][2] = -(2 * _near * _far) / (_far - _near);
-
+			//projectMatrix = glm::perspectiveFov(_fov * DEG2RAD, 800.f, 600.f, 0.3f, 200.f);
 			//projectMatrix = glm::perspectiveFovRH(_fov*DEG2RAD, 800.f, 600.f, _near, _far);
 		}
 
@@ -87,7 +87,6 @@ namespace softRD
 			viewMatrix[3][0] = -glm::dot(position, right);
 			viewMatrix[3][1] = -glm::dot(position, up);
 			viewMatrix[3][2] = glm::dot(position, forward);
-
 			eulerAngle = fMath::Dir2Euler(forward);
 			pitch = eulerAngle.x;
 			yaw = eulerAngle.y;
@@ -139,6 +138,7 @@ namespace softRD
 			viewMatrix[3][0] = -glm::dot(position, right);
 			viewMatrix[3][1] = -glm::dot(position, up);
 			viewMatrix[3][2] = glm::dot(position, forward);
+			
 			eulerAngle = fMath::Dir2Euler(forward);
 
 			pitch = eulerAngle.x;
