@@ -116,25 +116,58 @@ namespace softRD
 		{
 
 			//cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << endl;
+
 			if (cull.FrumstumCull(o1, o2, o3))
 			{
 				return false;
 			}
 
-			PerspectiveDivision(o1);
-			PerspectiveDivision(o2);
-			PerspectiveDivision(o3);
+			std::vector<V2f> clipingVertexs = cull.SutherlandHodgemanClip(o1, o2, o3);
 
-			
-			if (cull.FaceCull(cullfront, o1, o2, o3))
+			for (int i = 0; i < clipingVertexs.size(); i++) {
+				PerspectiveDivision(clipingVertexs[i]);
+				//ViewPortMapping(clipingVertexs[i]);
+				clipingVertexs[i].windowPos = Global::mainCamera->viewportMatrix* clipingVertexs[i].windowPos;
+				//视口变换
+				//o1.windowPos = Global::mainCamera->viewportMatrix * o1.windowPos;
+				//o2.windowPos = Global::mainCamera->viewportMatrix * o2.windowPos;
+				//o3.windowPos = Global::mainCamera->viewportMatrix * o3.windowPos;
+			}
+			int n = clipingVertexs.size() - 3 + 1;
+			for (int i = 0; i < n; i++) 
 			{
-				return false;
+				V2f f1 = clipingVertexs[0];
+				V2f f2 = clipingVertexs[i + 1];
+				V2f f3 = clipingVertexs[i + 2];
+
+				for (int s = 0; s < shader->pass.size(); s++)
+				{
+					f1.color = f2.color = f3.color = color;
+					Global::raster->RasterTriangle(f1, f2, f3, needDepthTest);
+					int len = Global::raster->index;
+					//std::cout << len << std::endl;
+					for (register int i = 0; i < len; i++)
+					{
+						Global::frameBuffer->WriteColor(Global::raster->resList[i].x, Global::raster->resList[i].y, shader->pass[s].fragmentShader(Global::raster->resList[i].o));
+					}
+				}
+
 			}
 
-			//视口变换
-			o1.windowPos = Global::mainCamera->viewportMatrix * o1.windowPos;
-			o2.windowPos = Global::mainCamera->viewportMatrix * o2.windowPos;
-			o3.windowPos = Global::mainCamera->viewportMatrix * o3.windowPos;
+			//PerspectiveDivision(o1);
+			//PerspectiveDivision(o2);
+			//PerspectiveDivision(o3);
+			//
+			//
+			//if (cull.FaceCull(cullfront, o1, o2, o3))
+			//{
+			//	return false;
+			//}
+			//
+			////视口变换
+			//o1.windowPos = Global::mainCamera->viewportMatrix * o1.windowPos;
+			//o2.windowPos = Global::mainCamera->viewportMatrix * o2.windowPos;
+			//o3.windowPos = Global::mainCamera->viewportMatrix * o3.windowPos;
 			return true;
 		}
 

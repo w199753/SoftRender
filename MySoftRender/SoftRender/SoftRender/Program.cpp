@@ -13,6 +13,7 @@
 #include"Shade/UnlitShader.h"
 #include"Shade/SkyBoxPreCompute.h"
 #include"Shade/SkyboxShader.h"
+#include"Shade/PBRShader.h"
 #include"Light/Light.h"
 
 #include "stb_image.h"
@@ -228,14 +229,14 @@ int main()
 	Global::mainCamera = std::make_unique<Camera>();
 	Global::mainCamera->SetViewportParams(0, 0, static_cast<float>(SCR_WIDTH), static_cast<float>(SCR_HEIGHT));
 	Global::mainCamera->SetTransformParam(pos, glm::vec3(0), glm::vec3(0));
-	Global::mainCamera->SetProjectParams(0.4f, 1000.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
+	Global::mainCamera->SetProjectParams(0.1f, 50.f, 60.f, static_cast<float>(SCR_WIDTH) / static_cast<float>(SCR_HEIGHT));
 
 	Global::frameBuffer = std::make_unique<FrameBuffer>(SCR_WIDTH, SCR_HEIGHT);
 
 	Global::raster = std::make_unique<Rasterization>();
 	Global::raster->SetRasterType(RasterType::Fill);
 
-
+	//----------------------------------------------------------------²ÄÖÊºÍÌùÍ¼
 	auto txt = std::make_shared<Texture>("Model/textures/Albedo.png", TextureType::LDR, true);
 	txt->filterType = FilterType::Bilinear;
 	Material phong_material;
@@ -254,10 +255,10 @@ int main()
 	Material unlit_material3;
 	creataMaterial<UnlitShader>(unlit_material3);
 
-	//Object obj("Model/cube_2.obj", unlit_material);
-	//obj.SetScale(0.1, 0.1, 0.1);
-	//obj.SetRotate(0, 10, 0);
-	//obj.SetTranslate(0, 0, 0);
+	Material pbr_material1;
+	creataMaterial<PBRShader>(pbr_material1);
+	//----------------------------------------------------------------------------
+
 
 	auto obj_light_1 = std::make_unique<Object>("Model/cube_2.obj", unlit_material1);
 	auto obj_light_2 = std::make_unique<Object>("Model/cube_2.obj", unlit_material2);

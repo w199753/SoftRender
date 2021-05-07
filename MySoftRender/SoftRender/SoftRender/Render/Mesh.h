@@ -32,10 +32,13 @@ namespace softRD
 			for (int i = 0; i < Indices.size(); i += 3)
 			{
 				Triangle* t = new Triangle();
+
 				t->AddVertices(Vertices[i], Vertices[i + 1], Vertices[i + 2]);
 				triangleStream.emplace_back(t);
 			}
 		}
+
+		
 
 
 		inline int getVectorVerticesSize() const { return Vertices.size(); }
