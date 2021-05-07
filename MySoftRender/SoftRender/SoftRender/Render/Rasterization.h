@@ -45,14 +45,14 @@ namespace softRD
 			type = _type;
 		}
 		int index = 0;
-		void RasterTriangle(const V2f& o1, const V2f& o2, const V2f& o3,bool needDepthTest)
+		void RasterTriangle(const V2f& o1, const V2f& o2, const V2f& o3, bool needDepthTest)
 		{
 			index = 0;
 			if ((type & RasterType::Line) == RasterType::Line)
 			{
-				RasterLine(o1, o2);
-				RasterLine(o2, o3);
-				RasterLine(o3, o1);
+				RasterLine(o1, o2, glm::vec4(0, 0.8, 0, 1));
+				RasterLine(o2, o3, glm::vec4(0, 0.8, 0, 1));
+				RasterLine(o3, o1, glm::vec4(0, 0.8, 0, 1));
 			}
 			if ((type & RasterType::Fill) == RasterType::Fill)
 			{
@@ -60,7 +60,7 @@ namespace softRD
 			}
 		}
 
-		void RasterFill(const V2f& o1, const V2f& o2, const V2f& o3,bool needDepthTest)
+		void RasterFill(const V2f& o1, const V2f& o2, const V2f& o3, bool needDepthTest)
 		{
 			int x1, y1, x2, y2;
 			GetBoundBox(o1.windowPos, o2.windowPos, o3.windowPos, x1, y1, x2, y2);
@@ -82,13 +82,13 @@ namespace softRD
 						float rB = (-(i - o3.windowPos.x) * (o1.windowPos.y - o3.windowPos.y) + (j - o3.windowPos.y) * (o1.windowPos.x - o3.windowPos.x)) / (-(o2.windowPos.x - o3.windowPos.x) * (o1.windowPos.y - o3.windowPos.y) + (o2.windowPos.y - o3.windowPos.y) * (o1.windowPos.x - o3.windowPos.x));
 						float rC = 1.0f - rA - rB;
 						float _z = o1.windowPos.z * rA + o2.windowPos.z * rB + o3.windowPos.z * rC;
-						if (needDepthTest==false)
+						if (needDepthTest == false)
 						{
 							if (_z <= Global::frameBuffer->GetDepth(i, j))
 							{
 								Global::frameBuffer->WriteDepth(i, j, 1);
 								V2f o((o1.worldPos * rA + o2.worldPos * rB + o3.worldPos * rC),
-									(glm::vec4(glm::vec3(o1.windowPos * rA + o2.windowPos * rB + o3.windowPos * rC),1)),
+									(glm::vec4(glm::vec3(o1.windowPos * rA + o2.windowPos * rB + o3.windowPos * rC), 1)),
 									(o1.color * rA + o2.color * rB + o3.color * rC),
 									(o1.normal * rA + o2.normal * rB + o3.normal * rC),
 									(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
@@ -137,7 +137,7 @@ namespace softRD
 				}
 			}
 		}
-		void RasterLine(const V2f& from, const V2f& to)
+		void RasterLine(const V2f& from, const V2f& to, const glm::vec4& col)
 		{
 			int dx = to.windowPos.x - from.windowPos.x;
 			int dy = to.windowPos.y - from.windowPos.y;
@@ -162,7 +162,7 @@ namespace softRD
 				for (int i = 0; i <= dx; ++i)
 				{
 					tmp = fMath::Lerp(from, to, ((float)(i) / dx));
-					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(0, 0.8, 0, 1));
+					Global::frameBuffer->WriteColor(currentX, currentY, col);
 					currentX += xDelta;
 					if (P <= 0)
 						P += 2 * dy;
@@ -180,7 +180,7 @@ namespace softRD
 				for (int i = 0; i <= dy; ++i)
 				{
 					tmp = fMath::Lerp(from, to, ((float)(i) / dy));
-					Global::frameBuffer->WriteColor(currentX, currentY, glm::vec4(0, 0.8, 0, 1));
+					Global::frameBuffer->WriteColor(currentX, currentY, col);
 					currentY += yDelta;
 					if (P <= 0)
 						P += 2 * dx;

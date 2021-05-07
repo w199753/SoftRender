@@ -31,11 +31,7 @@ namespace softRD
 
 		glm::vec4 FragmentShader(const V2f& v2f)override
 		{
-			glm::vec3 uv = glm::normalize(glm::vec3(v2f.worldPos.x, -v2f.worldPos.y, v2f.worldPos.z));
-			glm::vec4 col = block.skybox->SamplerCube(uv);
-			if (col.x == 0 && col.y == 0 && col.z == 0)
-				return glm::vec4(1);
-			return col;
+			return block.skybox->SamplerCube(glm::normalize(glm::vec3(v2f.worldPos.x, -v2f.worldPos.y, v2f.worldPos.z)));
 		}
 	};
 }

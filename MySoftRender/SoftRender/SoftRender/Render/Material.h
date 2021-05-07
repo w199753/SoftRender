@@ -73,6 +73,7 @@ namespace softRD
 		{
 			Global::verticesCount = 0;
 			Global::triangleCount = 0;
+			//绘制图形
 			for (int i = 0; i < stream.size(); i++)
 			{
 				for (int s = 0; s < shader->pass.size(); s++)
@@ -98,14 +99,35 @@ namespace softRD
 						for (register int i = 0; i < len; i++)
 						{
 							Global::frameBuffer->WriteColor(Global::raster->resList[i].x, Global::raster->resList[i].y, shader->pass[s].fragmentShader(Global::raster->resList[i].o));
-							//Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, shader->FragmentShader(resList[i].o));
-
-						//Global::frameBuffer->WriteColor(resList[i].x, resList[i].y, glm::vec4(1));
 						}
 					}
 				}
 			}
+
+			//绘制辅助线
+			for (int i = 0; i < stream.size(); i++)
+			{
+				DrawTangent(*stream[i], glm::vec4(1, 0, 0, 1));
+				DrawNormal(*stream[i], glm::vec4(0, 0, 1, 1));
+				DrawBiTangent(*stream[i], glm::vec4(0, 1, 0, 1));
+			}
 		}
+
+		void DrawTangent(const Triangle& v1, glm::vec4 color)
+		{
+
+		}
+
+		void DrawNormal(const Triangle& v1, glm::vec4 color)
+		{
+
+		}
+
+		void DrawBiTangent(const Triangle& v1, glm::vec4 color)
+		{
+
+		}
+
 		std::unique_ptr<Shader> shader;
 	private:
 		ShadingType type = ShadingType::Phong;
@@ -114,25 +136,27 @@ namespace softRD
 
 		bool PreRasterSetting(V2f& o1, V2f& o2, V2f& o3)
 		{
-
-			//cout << o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << " " << o1.windowPos.w << endl;
-
+			//视椎体裁剪 -裁剪掉完全在视椎体外的图元
 			if (cull.FrumstumCull(o1, o2, o3))
 			{
 				return false;
 			}
-
+			//视口剔除---（好坑啊，天空盒没有这个要gg啊）
 			std::vector<V2f> clipingVertexs = cull.SutherlandHodgemanClip(o1, o2, o3);
 
 			for (int i = 0; i < clipingVertexs.size(); i++) {
 				PerspectiveDivision(clipingVertexs[i]);
-				//ViewPortMapping(clipingVertexs[i]);
+				//视口映射
 				clipingVertexs[i].windowPos = Global::mainCamera->viewportMatrix* clipingVertexs[i].windowPos;
-				//视口变换
-				//o1.windowPos = Global::mainCamera->viewportMatrix * o1.windowPos;
-				//o2.windowPos = Global::mainCamera->viewportMatrix * o2.windowPos;
-				//o3.windowPos = Global::mainCamera->viewportMatrix * o3.windowPos;
 			}
+			//面剔除
+			if (cull.FaceCull(cullfront, clipingVertexs[0], clipingVertexs[1], clipingVertexs[2]))
+			{
+				return false;
+			}
+			
+
+
 			int n = clipingVertexs.size() - 3 + 1;
 			for (int i = 0; i < n; i++) 
 			{
@@ -153,21 +177,6 @@ namespace softRD
 				}
 
 			}
-
-			//PerspectiveDivision(o1);
-			//PerspectiveDivision(o2);
-			//PerspectiveDivision(o3);
-			//
-			//
-			//if (cull.FaceCull(cullfront, o1, o2, o3))
-			//{
-			//	return false;
-			//}
-			//
-			////视口变换
-			//o1.windowPos = Global::mainCamera->viewportMatrix * o1.windowPos;
-			//o2.windowPos = Global::mainCamera->viewportMatrix * o2.windowPos;
-			//o3.windowPos = Global::mainCamera->viewportMatrix * o3.windowPos;
 			return true;
 		}
 
