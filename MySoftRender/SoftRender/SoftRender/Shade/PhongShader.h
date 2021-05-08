@@ -30,6 +30,7 @@ namespace softRD
 			//cout << modelMatrix << endl;
 			//cout << v.position << endl;
 			o.worldPos = modelMatrix * vertex.position;
+			
 			//cout << vertex.position.x<<" "<<vertex.position.y<<" "<<vertex.position.z << "        " << o.worldPos.x<<" "<< o.worldPos.y<<" "<< o.worldPos.z << endl;
 			//cout << o.worldPos<<">>>"<<v.position << endl;
 			o.windowPos = Global::mainCamera->projectMatrix * Global::mainCamera->viewMatrix * o.worldPos;

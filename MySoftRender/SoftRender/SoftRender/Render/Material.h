@@ -80,7 +80,6 @@ namespace softRD
 				{
 					//continue;
 					V2f o1 = shader->pass[s].vertexShader(stream[i]->v2());
-					
 					V2f o2 = shader->pass[s].vertexShader(stream[i]->v1());
 					V2f o3 = shader->pass[s].vertexShader(stream[i]->v0());
 					//cout <<"xxxxxx"<< o1.windowPos.x << " " << o1.windowPos.y << " " << o1.windowPos.z << endl;
@@ -103,24 +102,86 @@ namespace softRD
 					}
 				}
 			}
-
-			//»æÖÆ¸¨ÖúÏß
-			for (int i = 0; i < stream.size(); i++)
+			if (needDepthTest == true)
 			{
-				DrawTangent(*stream[i], glm::vec4(1, 0, 0, 1));
-				DrawNormal(*stream[i], glm::vec4(0, 0, 1, 1));
-				DrawBiTangent(*stream[i], glm::vec4(0, 1, 0, 1));
+				//for (int i = 0; i < stream.size(); i++)
+				//{
+				//	DrawTangent(*stream[i], glm::vec4(1, 0, 0, 1));
+				//	DrawNormal(*stream[i], glm::vec4(0, 0, 1, 1));
+				//}
 			}
+
 		}
+
 
 		void DrawTangent(const Triangle& v1, glm::vec4 color)
 		{
+			Vertex v2_v0 = v1.v0();
+			Vertex v2_v1 = v1.v1();
+			Vertex v2_v2 = v1.v2();
+			v2_v0.position += glm::normalize(shader->block.transform->scaleMatrix * glm::vec4(glm::vec3(v1.v0().tangent), 0));
+			v2_v1.position += glm::normalize(shader->block.transform->scaleMatrix * glm::vec4(glm::vec3(v1.v1().tangent), 0));
+			v2_v2.position += glm::normalize(shader->block.transform->scaleMatrix * glm::vec4(glm::vec3(v1.v2().tangent), 0));
 
+			V2f o1_1 = shader->pass[0].vertexShader(v1.v0());
+			V2f o1_2 = shader->pass[0].vertexShader(v1.v1());
+			V2f o1_3 = shader->pass[0].vertexShader(v1.v2());
+			PerspectiveDivision(o1_1);
+			PerspectiveDivision(o1_2);
+			PerspectiveDivision(o1_3);
+			o1_1.windowPos = Global::mainCamera->viewportMatrix * o1_1.windowPos;
+			o1_2.windowPos = Global::mainCamera->viewportMatrix * o1_2.windowPos;
+			o1_3.windowPos = Global::mainCamera->viewportMatrix * o1_3.windowPos;
+
+			V2f o2_1 = shader->pass[0].vertexShader(v2_v0);
+			V2f o2_2 = shader->pass[0].vertexShader(v2_v1);
+			V2f o2_3 = shader->pass[0].vertexShader(v2_v2);
+			PerspectiveDivision(o2_1);
+			PerspectiveDivision(o2_2);
+			PerspectiveDivision(o2_3);
+			o2_1.windowPos = Global::mainCamera->viewportMatrix * o2_1.windowPos;
+			o2_2.windowPos = Global::mainCamera->viewportMatrix * o2_2.windowPos;
+			o2_3.windowPos = Global::mainCamera->viewportMatrix * o2_3.windowPos;
+
+
+			Global::raster->RasterLine(o1_1, o2_1, color);
+			//Global::raster->RasterLine(o1_2, o2_2, color);
+			//Global::raster->RasterLine(o1_3, o2_3, color);
 		}
 
 		void DrawNormal(const Triangle& v1, glm::vec4 color)
 		{
+			Vertex v2_v0 = v1.v0();
+			Vertex v2_v1 = v1.v1();
+			Vertex v2_v2 = v1.v2();
+			v2_v0.position += glm::normalize(shader->block.transform->scaleMatrix * glm::vec4(glm::vec3(v1.v0().normal), 0));
+			v2_v1.position += glm::normalize(shader->block.transform->scaleMatrix * glm::vec4(glm::vec3(v1.v1().normal), 0));
+			v2_v2.position += glm::normalize(shader->block.transform->scaleMatrix * glm::vec4(glm::vec3(v1.v2().normal), 0));
 
+			V2f o1_1 = shader->pass[0].vertexShader(v1.v0());
+			V2f o1_2 = shader->pass[0].vertexShader(v1.v1());
+			V2f o1_3 = shader->pass[0].vertexShader(v1.v2());
+			PerspectiveDivision(o1_1);
+			PerspectiveDivision(o1_2);
+			PerspectiveDivision(o1_3);
+			o1_1.windowPos = Global::mainCamera->viewportMatrix * o1_1.windowPos;
+			o1_2.windowPos = Global::mainCamera->viewportMatrix * o1_2.windowPos;
+			o1_3.windowPos = Global::mainCamera->viewportMatrix * o1_3.windowPos;
+
+			V2f o2_1 = shader->pass[0].vertexShader(v2_v0);
+			V2f o2_2 = shader->pass[0].vertexShader(v2_v1);
+			V2f o2_3 = shader->pass[0].vertexShader(v2_v2);
+			PerspectiveDivision(o2_1);
+			PerspectiveDivision(o2_2);
+			PerspectiveDivision(o2_3);
+			o2_1.windowPos = Global::mainCamera->viewportMatrix * o2_1.windowPos;
+			o2_2.windowPos = Global::mainCamera->viewportMatrix * o2_2.windowPos;
+			o2_3.windowPos = Global::mainCamera->viewportMatrix * o2_3.windowPos;
+
+
+			Global::raster->RasterLine(o1_1, o2_1, color);
+			//Global::raster->RasterLine(o1_2, o2_2, color);
+			//Global::raster->RasterLine(o1_3, o2_3, color);
 		}
 
 		void DrawBiTangent(const Triangle& v1, glm::vec4 color)
@@ -193,6 +254,7 @@ namespace softRD
 			//v.color *= v.Z;
 			v.texcoord *= v.Z;
 			v.worldPos *= v.Z;
+			v.tbn *= v.Z;
 		}
 
 	};

@@ -237,14 +237,32 @@ int main()
 	Global::raster->SetRasterType(RasterType::Fill);
 
 	//----------------------------------------------------------------²ÄÖÊºÍÌùÍ¼
-	auto txt = std::make_shared<Texture>("Model/textures/Albedo.png", TextureType::LDR, true);
-	txt->filterType = FilterType::Bilinear;
+	auto albedoTxt = std::make_shared<Texture>("Model/Helmet/Albedo.tga", TextureType::LDR, true);
+	albedoTxt->filterType = FilterType::Bilinear;
+	albedoTxt->wrapType = WrapType::Repeat;
+
+	auto normalTxt = std::make_shared<Texture>("Model/Scanner/Normal.png", TextureType::LDR, false);
+	normalTxt->filterType = FilterType::Bilinear;
+	normalTxt->wrapType= WrapType::Repeat;
+
+	auto metallicTxt = std::make_shared<Texture>("Model/Helmet/Metallic.tga", TextureType::LDR, false);
+	metallicTxt->filterType = FilterType::Bilinear;
+	metallicTxt->wrapType = WrapType::Repeat;
+
+	auto roughnessTxt = std::make_shared<Texture>("Model/Helmet/Roughness.tga", TextureType::LDR, false);
+	roughnessTxt->filterType = FilterType::Bilinear;
+	roughnessTxt->wrapType = WrapType::Repeat;
+
+	auto aoTxt = std::make_shared<Texture>("Model/Scanner/Normal.png", TextureType::LDR, false);
+	aoTxt->filterType = FilterType::Bilinear;
+	aoTxt->wrapType = WrapType::Repeat;
+
 	Material phong_material;
 	Material phong_material2;
 	creataMaterial<PhongShader>(phong_material);
 	creataMaterial<PhongShader>(phong_material2);
-	phong_material.shader->block.albedo = txt;
-	phong_material2.shader->block.albedo = txt;
+	phong_material.shader->block.albedo = albedoTxt;
+	phong_material2.shader->block.albedo = albedoTxt;
 
 	Material unlit_material1;
 	creataMaterial<UnlitShader>(unlit_material1);
@@ -257,6 +275,11 @@ int main()
 
 	Material pbr_material1;
 	creataMaterial<PBRShader>(pbr_material1);
+	pbr_material1.shader->block.albedo = albedoTxt;
+	pbr_material1.shader->block.normal = normalTxt;
+	pbr_material1.shader->block.metallic = metallicTxt;
+	pbr_material1.shader->block.roughness = roughnessTxt;
+	pbr_material1.shader->block.ao = aoTxt;
 	//----------------------------------------------------------------------------
 
 
@@ -317,6 +340,12 @@ int main()
 	skyboxObj->SetRotate(0, 0, 0);
 	skyboxObj->SetTranslate(0, 0, 0);
 
+	
+	//²âÊÔpbrÀý×Ó£º
+	Object obj_pbr_test("Model/Helmet/helmet.obj", pbr_material1);
+	obj_pbr_test.SetScale(0.1, 0.1, 0.1);
+	obj_pbr_test.SetRotate(0, 90, 0);
+	obj_pbr_test.SetTranslate(0, -0.5, 0.0 + 0.45);
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -362,7 +391,7 @@ int main()
 		//		Global::frameBuffer->WriteColor(i,j, glm::vec4(1));
 		//}
 		
-		skyboxObj->RenderObject();
+		//skyboxObj->RenderObject();
 
 		for (size_t i = 0; i < Global::pointLightList.size(); i++)
 		{
@@ -374,6 +403,7 @@ int main()
 		}
 		preSkyObj->RenderObject();
 		
+		obj_pbr_test.RenderObject();                    
 		//obj.RenderObject();
 		//obj1.RenderObject();
 		//

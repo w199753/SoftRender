@@ -2,6 +2,7 @@
 #include"Vertex.h"
 #include"../Math/fMath.h"
 #include <glm/trigonometric.hpp>
+#include<iostream>
 
 //class Vertex;
 namespace softRD
@@ -28,6 +29,12 @@ namespace softRD
 				CalTangent(i, (i + 1) % 3, (i + 2) % 3);
 			}
 
+			//std::cout << "fzy n1 " << v1.normal.x << " " << v1.normal.y << " " << v1.normal.z << std::endl;
+			//std::cout << "fzy n2 " << v2.normal.x << " " << v2.normal.y << " " << v2.normal.z << std::endl;
+			//std::cout << "fzy n3 " << v3.normal.x << " " << v3.normal.y << " " << v3.normal.z << std::endl;
+			//std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+
+
 		}
 
 		void CalTangent(int a, int b, int c)
@@ -44,14 +51,17 @@ namespace softRD
 
 			float r = 1.0f / (delta_v1 * delta_u2 - delta_v2 * delta_u1);
 			//glm::vec3 tan1 = (delta_v1*e2 - delta_v2*e1)*r;
-			glm::vec3 tan1 = (delta_v2 * e1 - delta_v1 * e2) * r;
+			glm::vec3 tan1 = (delta_v1 * e2 - delta_v2 * e1) * r;
 			glm::vec3 tan2 = (delta_u1 * e2 - delta_u2 * e1) * r;
 
 			auto t = tan1;
 			glm::vec4 tangent = glm::vec4(glm::normalize((t - n * glm::dot(n, t))), 1);
+			//tangent.x= (delta_v2 * e1.x - delta_v1 * e2.x) * r;
+			//tangent.y = (delta_v2 * e1.y - delta_v1 * e2.y) * r;
+			//tangent.z = (delta_v2 * e1.z - delta_v1 * e2.z) * r;
 			tangent.w = (glm::dot(glm::cross(n, t), tan2) < 0.0f) ? -1.0f : 1.0f;
 			vertices[a].tangent = tangent;
-			vertices[a].biTangent = glm::cross(glm::normalize(n), glm::vec3(tangent)) * tangent.w;
+			//vertices[a].biTangent = glm::cross(glm::normalize(n), glm::vec3(tangent)) * tangent.w;
 		}
 
 		Vertex v0()const { return vertices[0]; }

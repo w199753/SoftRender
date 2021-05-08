@@ -92,11 +92,13 @@ namespace softRD
 									(o1.color * rA + o2.color * rB + o3.color * rC),
 									(o1.normal * rA + o2.normal * rB + o3.normal * rC),
 									(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
+									(o1.tbn * rA + o2.tbn * rB + o3.tbn * rC),
 									(o1.Z * rA + o2.Z * rB + o3.Z * rC));
 								float divZ = (1.0f / o.Z);
 								//o.worldPos *= divZ;
 								o.normal *= divZ;
 								//o.color *= divZ;
+								o.tbn *= divZ;
 								o.texcoord *= divZ;
 
 								resList[index].y = j;
@@ -116,10 +118,12 @@ namespace softRD
 									(o1.color * rA + o2.color * rB + o3.color * rC),
 									(o1.normal * rA + o2.normal * rB + o3.normal * rC),
 									(o1.texcoord * rA + o2.texcoord * rB + o3.texcoord * rC),
+									(o1.tbn * rA + o2.tbn * rB + o3.tbn * rC),
 									(o1.Z * rA + o2.Z * rB + o3.Z * rC));
 								float divZ = (1.0f / o.Z);
 								o.worldPos *= divZ;
 								o.normal *= divZ;
+								o.tbn *= divZ;
 								//o.color *= divZ;
 								o.texcoord *= divZ;
 

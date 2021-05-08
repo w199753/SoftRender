@@ -186,7 +186,14 @@ glm::vec4 softRD::Texture::Sampler2D(const glm::vec2& uv)
 	if (txtType == TextureType::LDR)
 	{
 		//p = data;
-		p = mipmapData[0]->data;
+		if (isGenMipmap)
+		{
+			p = mipmapData[0]->data;
+		}
+		else
+		{
+			p = this->data;
+		}
 		return internal_Sampler2D(uv, res, p) * Div255;
 	}
 	else if (txtType == TextureType::HDR)

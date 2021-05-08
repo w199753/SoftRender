@@ -214,14 +214,14 @@ glm::vec4& fMath::Srgb2Linear(glm::vec4& col)
 }
 
 //把法线贴图的rgb值变换到 -1,1的法线域
-glm::vec4& fMath::UnPackTexture(glm::vec4& t_col)
+glm::vec4& fMath::UnPackNormal(glm::vec4& t_col)
 {
 	t_col =  t_col*2.f -1.f;
 	return t_col;
 }
 
 //把法线贴图的-1,1法线域变换到rgb的颜色值   (写入贴图时才会用到，一般基本用不到
-glm::vec4& fMath::PackTexture(glm::vec4& t_col)
+glm::vec4& fMath::PackNormal(glm::vec4& t_col)
 {
 	t_col = t_col * 0.5f + 0.5f;
 	return t_col;
