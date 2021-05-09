@@ -40,6 +40,7 @@ namespace softRD
 		{
 			//return glm::vec4(1);
 			glm::vec4 albedo = block.albedo->Sampler2D(v2f.texcoord);
+			float ao = block.ao->Sampler2D(v2f.texcoord).r;
 			//return albedo;
 			//glm::vec3 N = fMath::UnPackNormal(block.normal->Sampler2D(v2f.texcoord));
 			glm::vec3 N = glm::normalize(v2f.normal);
@@ -54,7 +55,10 @@ namespace softRD
 			float NdotV = std::max(glm::dot(N, V),0.f);
 			float HdotV = std::max(glm::dot(N_half, V), 0.f);
 			float NdotL = std::max(glm::dot(N, L_dir), 0.f);
-			return CalDirLight(albedo,V,N,L_dir,roughness,metallic,NdotH,NdotV,HdotV, NdotL);
+
+			glm::vec4 dirLight = CalDirLight(albedo, V, N, L_dir, roughness, metallic, NdotH, NdotV, HdotV, NdotL);
+			glm::vec4 inDirLight = CalInDirLight(albedo,v2f.worldPos,V,N,metallic,roughness,NdotV);
+			return (dirLight+inDirLight)*ao;
 		}
 
 		float NormalDistributionFunciont_GGX(float roughness,float NdotH)
@@ -104,7 +108,34 @@ namespace softRD
 			glm::vec4 specular = (D*G*ks)/denom;
 
 			glm::vec4 diffuse = albedo * kd;
+			return specular;
 			return (diffuse+specular)*NdotL*Global::dirLightList[0]->intensity*glm::vec4(Global::dirLightList[0]->color,1);
+		}
+
+		glm::vec4 fresnelSchlickRoughness(float cosTheta, glm::vec4 F0, float roughness)
+		{
+			return F0 + (max(glm::vec4(1) * (1 - roughness), F0) - F0) * pow(1.0f - cosTheta, 5.0f);
+		}
+		glm::vec4 CalInDirLight(glm::vec4 albedo,const glm::vec3& worldPos, const glm::vec3& V,const glm::vec3& N,float metallic,float roughness, float NdotV)
+		{
+			glm::vec3 normal = glm::normalize(worldPos);
+			glm::vec4 diffuse(0);
+			glm::vec4 specular(0);
+
+			glm::vec4 F0 = fMath::Lerp(glm::vec4(0.04), albedo, metallic);
+			glm::vec4 ks = fresnelSchlickRoughness(NdotV,F0, roughness);
+			glm::vec4 kd = glm::vec4(1) - ks;
+			kd *= (1.0 - metallic);
+
+			glm::vec3 R = glm::reflect(-V, N);
+			glm::vec4 radiance = block.radiance->SamplerCube(glm::vec3(R.x,-R.y,R.z));
+			glm::vec4 brdfRes = block.brdf->Sampler2D(glm::vec2(NdotV, roughness));
+			glm::vec2 envBrdf(brdfRes.x, brdfRes.y);
+			glm::vec4 brdfSpecualr = radiance * (ks * envBrdf.x + envBrdf.y);
+			glm::vec4 irradiance = block.irradiance->SamplerCube(glm::vec3(N.x,-N.y,N.z));
+			diffuse = (albedo * irradiance * kd + brdfSpecualr);
+			//std::cout << normal.x << " " << normal.y << " " << normal.z << " " << std::endl;
+			return diffuse;
 		}
 
 	private:

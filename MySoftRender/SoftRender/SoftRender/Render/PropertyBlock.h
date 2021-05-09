@@ -23,6 +23,10 @@ namespace softRD
 		std::shared_ptr<Texture> ao;
 		//后面还有pbr的一坨贴图 metallic,roughness,normal,ao ..
 		std::shared_ptr<Texture3D> skybox;
+		std::shared_ptr<Texture3D> irradiance;
+		std::shared_ptr<Texture3D> radiance;
+		std::shared_ptr<Texture> brdf;
+
 		std::unique_ptr<Transform> transform;
 	private:
 
