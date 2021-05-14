@@ -1,0 +1,17 @@
+            float2 getUV(float3 v)
+            {
+                float2 invAtan = float2(0.1591,0.3183);
+                
+                float2 uv = float2(atan2(v.z, v.x), asin(v.y));
+                // to [0,1].
+                uv *= invAtan;
+                uv += 0.5;
+                return uv;
+            }
+            fixed4 frag (v2f i) : SV_Target
+            {
+                // sample the texture
+                float2 uv = getUV(normalize(i.worldPos) );
+                fixed4 col = tex2D(_MainTex, uv);
+                return col;
+            }
