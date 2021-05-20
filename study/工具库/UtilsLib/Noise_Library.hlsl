@@ -1,6 +1,7 @@
 #ifndef _Noise_Library_
 #define _Noise_Library_
 
+#include "Common.hlsl"
 
 float RandN(float2 pos, float2 random)
 {
@@ -66,6 +67,62 @@ float3 Step3T(float2 uv, float time)
 	float b=Step2(uv, 0.11*(frac(time)+1.0));    
 	float c=Step2(uv, 0.13*(frac(time)+1.0));
 	return float3(a,b,c);
+}
+
+
+//--圆形噪声
+#define NUM_SAMPLES 20
+#define NUM_RINGS 20
+
+float2 poissonDisk[NUM_SAMPLES];
+float rand_1to1(float x ) { 
+  // -1 -1
+  
+  return frac(sin(x)*10000.0);
+}
+
+float rand_2to1(float2 uv ) { 
+  // 0 - 1
+	float a = 12.9898, b = 78.233, c = 43758.5453;
+	float dt = dot( uv, float2( a,b ) );
+    float sn = dt%PI;
+    //float sn = modf( dt, PI );
+	return frac(sin(sn) * c);
+}
+void poissonDiskSamples(in float2 randomSeed ) {
+
+  float ANGLE_STEP = Two_PI * float( NUM_RINGS ) / float( NUM_SAMPLES );
+  float INV_NUM_SAMPLES = 1.0 / float( NUM_SAMPLES );
+
+  float angle = rand_2to1( randomSeed ) * Two_PI;
+  float radius = INV_NUM_SAMPLES;
+  float radiusStep = radius;
+
+  for( int i = 0; i < NUM_SAMPLES; i ++ ) {
+    poissonDisk[i] = float2( cos( angle ), sin( angle ) ) * pow( radius, 0.75 );
+    radius += radiusStep;
+    angle += ANGLE_STEP;
+  }
+}
+
+void uniformDiskSamples(in float2 randomSeed ) {
+
+  float randNum = rand_2to1(randomSeed);
+  float sampleX = rand_1to1( randNum ) ;
+  float sampleY = rand_1to1( sampleX ) ;
+
+  float angle = sampleX * Two_PI;
+  float radius = sqrt(sampleY);
+
+  for( int i = 0; i < NUM_SAMPLES; i ++ ) {
+    poissonDisk[i] = float2( radius * cos(angle) , radius * sin(angle)  );
+
+    sampleX = rand_1to1( sampleY ) ;
+    sampleY = rand_1to1( sampleX ) ;
+
+    angle = sampleX * Two_PI;
+    radius = sqrt(sampleY);
+  }
 }
 
 #endif

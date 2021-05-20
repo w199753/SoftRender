@@ -3,6 +3,37 @@
 
 #include "Common.hlsl"
 
+//---------DiskKernel
+// rings = 3
+// points per ring = 7
+static const int kSampleCount = 22;
+static const float2 kDiskKernel[kSampleCount] = {
+    float2(0,0),
+    float2(0.53333336,0),
+    float2(0.3325279,0.4169768),
+    float2(-0.11867785,0.5199616),
+    float2(-0.48051673,0.2314047),
+    float2(-0.48051673,-0.23140468),
+    float2(-0.11867763,-0.51996166),
+    float2(0.33252785,-0.4169769),
+    float2(1,0),
+    float2(0.90096885,0.43388376),
+    float2(0.6234898,0.7818315),
+    float2(0.22252098,0.9749279),
+    float2(-0.22252095,0.9749279),
+    float2(-0.62349,0.7818314),
+    float2(-0.90096885,0.43388382),
+    float2(-1,0),
+    float2(-0.90096885,-0.43388376),
+    float2(-0.6234896,-0.7818316),
+    float2(-0.22252055,-0.974928),
+    float2(0.2225215,-0.9749278),
+    float2(0.6234897,-0.7818316),
+    float2(0.90096885,-0.43388376),
+};
+
+//-----------
+
 
 //////Color filter
 inline half HdrWeight4(half3 Color, half Exposure)
@@ -390,6 +421,58 @@ half4 Kuwaharafilter_HQ(Texture2D ColorTexture, SamplerState sampler_ColorTextur
     }
 
     return half4(FinalColor, 1.0);
+}
+
+//三角滤波
+fixed4 TentSimpleFilter(sampler2D ColorTexture, float2 uv, float2 TexelSize)
+{
+    TexelSize = 1.0 / TexelSize;
+    float4 o = TexelSize.xyxy * float2(-0.5, 0.5).xxyy;
+	half3 s =
+		tex2D(ColorTexture, uv + o.xy).rgb +
+		tex2D(ColorTexture, uv + o.zy).rgb +
+		tex2D(ColorTexture, uv + o.xw).rgb +
+		tex2D(ColorTexture, uv + o.zw).rgb;
+	return fixed4(s * 0.25,1.0);
+}
+
+fixed4 TentSimpleFilter(Texture2D ColorTexture, SamplerState sampler_ColorTexture , half2 uv, half2 TexelSize)
+{
+    TexelSize = 1.0 / TexelSize;
+        float4 o = TexelSize.xyxy * float2(-0.5, 0.5).xxyy;
+	fixed3 s =
+		ColorTexture.SampleLevel( sampler_ColorTexture, uv + o.xy, 0.0).rgb+
+        ColorTexture.SampleLevel( sampler_ColorTexture, uv + o.zy, 0.0).rgb+
+        ColorTexture.SampleLevel( sampler_ColorTexture, uv + o.xw, 0.0).rgb+
+        ColorTexture.SampleLevel( sampler_ColorTexture, uv + o.zw, 0.0).rgb;
+	return fixed4(s*0.25,1.0);
+}
+
+//圆型滤波
+fixed4 TentSimpleFilter(sampler2D ColorTexture, float2 uv, float2 TexelSize,float Range)
+{
+    TexelSize = 1.0/TexelSize;
+    fixed3 s = fixed3(0,0,0) ;
+    for(int i=0 ;i<kSampleCount;i++)
+    {
+        float2 o = kDiskKernel[i];
+        o *= TexelSize.xy * Range;
+        s += tex2D(ColorTexture,uv+o.xy).rgb;
+    }
+    return fixed4(s/(float)kSampleCount,1.0);
+}
+
+fixed4 DiskSimpleFilter(Texture2D ColorTexture, SamplerState sampler_ColorTexture , half2 uv, half2 TexelSize, float Range)
+{
+    TexelSize = 1.0/TexelSize;
+    fixed3 s = fixed3(0,0,0) ;
+    for(int i=0 ;i<kSampleCount;i++)
+    {
+        float2 o = kDiskKernel[i];
+        o *= TexelSize.xy * Range;
+        s += ColorTexture.SampleLevel( sampler_ColorTexture, uv + o.xy, 0.0).rgb;
+    }
+    return fixed4(s/(float)kSampleCount,1.0);
 }
 
 

@@ -11,9 +11,9 @@
 #define float4x4 half4x4
 #define float4x3 half4x3
 
-#define PI 3.1415926
+#define PI 3.141592653589793
 #define Inv_PI 0.3183091
-#define Two_PI 6.2831852
+#define Two_PI 6.283185307179586
 #define Inv_Two_PI 0.15915494
 
 
