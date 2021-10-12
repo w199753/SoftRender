@@ -43,14 +43,25 @@ namespace softRD
 			float ao = block.ao->Sampler2D(v2f.texcoord).r;
 			//return albedo;
 			//glm::vec3 N = fMath::UnPackNormal(block.normal->Sampler2D(v2f.texcoord));
-			glm::vec3 N = glm::normalize(v2f.normal);
+			glm::vec3 N;
+			if (block.normal.get() == NULL)
+			{
+				N = glm::normalize(v2f.normal);
+
+			}
+			else
+			{
+				N = fMath::UnPackNormal(block.normal->Sampler2D(v2f.texcoord));
+			}
+			N = glm::normalize(N);
+			//return glm::vec4(N, 1);
 			glm::vec3 L_dir = glm::normalize(Global::dirLightList[0]->dirction);
 			glm::vec3 V = glm::normalize(Global::mainCamera->position - glm::vec3(v2f.worldPos));
-			glm::vec3 N_half = glm::normalize(N + V);
+			glm::vec3 N_half = glm::normalize(L_dir + V);
 
 			float metallic = block.metallic->Sampler2D(v2f.texcoord).r;
-			float roughness = block.metallic->Sampler2D(v2f.texcoord).r;
-
+			float roughness = block.roughness->Sampler2D(v2f.texcoord).r;
+			//roughness = 0.2;
 			float NdotH = std::max(0.f,glm::dot(N, N_half));
 			float NdotV = std::max(glm::dot(N, V),0.f);
 			float HdotV = std::max(glm::dot(N_half, V), 0.f);
@@ -58,7 +69,9 @@ namespace softRD
 
 			glm::vec4 dirLight = CalDirLight(albedo, V, N, L_dir, roughness, metallic, NdotH, NdotV, HdotV, NdotL);
 			glm::vec4 inDirLight = CalInDirLight(albedo,v2f.worldPos,V,N,metallic,roughness,NdotV);
-			return (dirLight+inDirLight)*ao;
+			//return dirLight;
+			glm::vec4 res = (dirLight + inDirLight) * ao + block.emission->Sampler2D(v2f.texcoord);
+			return fMath::Srgb2Linear(fMath::FloatAces(res));
 		}
 
 		float NormalDistributionFunciont_GGX(float roughness,float NdotH)
@@ -107,8 +120,8 @@ namespace softRD
 			float denom = (4.0f * NdotV * NdotL +0.0001f);
 			glm::vec4 specular = (D*G*ks)/denom;
 
-			glm::vec4 diffuse = albedo * kd;
-			return specular;
+			glm::vec4 diffuse = albedo * kd*one_div_pi;
+			//return specular;
 			return (diffuse+specular)*NdotL*Global::dirLightList[0]->intensity*glm::vec4(Global::dirLightList[0]->color,1);
 		}
 
@@ -128,11 +141,11 @@ namespace softRD
 			kd *= (1.0 - metallic);
 
 			glm::vec3 R = glm::reflect(-V, N);
-			glm::vec4 radiance = block.radiance->SamplerCube(glm::vec3(R.x,-R.y,R.z));
-			glm::vec4 brdfRes = block.brdf->Sampler2D(glm::vec2(NdotV, roughness));
+			glm::vec4 radiance = fMath::Linear2Srgb(block.radiance->SamplerCube(glm::vec3(R.x,-R.y,R.z)));
+			glm::vec4 brdfRes = (block.brdf->Sampler2D(glm::vec2(NdotV, roughness)));
 			glm::vec2 envBrdf(brdfRes.x, brdfRes.y);
 			glm::vec4 brdfSpecualr = radiance * (ks * envBrdf.x + envBrdf.y);
-			glm::vec4 irradiance = block.irradiance->SamplerCube(glm::vec3(N.x,-N.y,N.z));
+			glm::vec4 irradiance = fMath::Linear2Srgb(block.irradiance->SamplerCube(glm::vec3(N.x,-N.y,N.z)));
 			diffuse = (albedo * irradiance * kd + brdfSpecualr);
 			//std::cout << normal.x << " " << normal.y << " " << normal.z << " " << std::endl;
 			return diffuse;

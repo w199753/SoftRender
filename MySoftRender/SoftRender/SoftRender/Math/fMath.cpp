@@ -210,7 +210,26 @@ glm::vec4& fMath::Linear2Srgb(glm::vec4& col)
 
 glm::vec4& fMath::Srgb2Linear(glm::vec4& col)
 {
-	return glm::vec4();
+	col.x = powf(col.x, 1.0/2.2f);
+	col.z = powf(col.z, 1.0 / 2.2f);
+	col.y = powf(col.y, 1.0 / 2.2f);
+	col.w = powf(col.w, 1.0 / 2.2f);
+	return col;
+}
+
+glm::vec4& fMath::FloatAces(glm::vec4& col)
+{
+
+	float a = 2.51f;
+	float b = 0.03f;
+	float c = 2.43f;
+	float d = 0.59f;
+	float e = 0.14f;
+	col.r = fMath::Saturate((col.r * (a * col.r + b)) / (col.r * (c * col.r + d) + e));
+	col.g = fMath::Saturate((col.g * (a * col.g + b)) / (col.g * (c * col.g + d) + e));
+	col.b = fMath::Saturate((col.b * (a * col.b + b)) / (col.b * (c * col.b + d) + e));
+	col.a = fMath::Saturate((col.a * (a * col.a + b)) / (col.a * (c * col.a + d) + e));
+	return col;
 }
 
 //把法线贴图的rgb值变换到 -1,1的法线域

@@ -86,6 +86,7 @@ public:
 	static glm::vec3 GetFaceNormal(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3);
 	static glm::vec4& Linear2Srgb(glm::vec4& col);
 	static glm::vec4& Srgb2Linear(glm::vec4& col);
+	static glm::vec4& FloatAces(glm::vec4& col);
 	static glm::vec4& UnPackNormal(glm::vec4& t_col);
 	static glm::vec4& PackNormal(glm::vec4& t_col);
 };

@@ -253,9 +253,44 @@ int main()
 	roughnessTxt->filterType = FilterType::Bilinear;
 	roughnessTxt->wrapType = WrapType::Repeat;
 
-	auto aoTxt = std::make_shared<Texture>("Model/Scanner/Normal.png", TextureType::LDR, false);
+	auto aoTxt = std::make_shared<Texture>("Model/Helmet/Ao.tga", TextureType::LDR, false);
 	aoTxt->filterType = FilterType::Bilinear;
 	aoTxt->wrapType = WrapType::Repeat;
+
+	auto emissionTxt = std::make_shared<Texture>("Model/Helmet/Emission.tga", TextureType::LDR, false);
+	emissionTxt->filterType = FilterType::Bilinear;
+	emissionTxt->wrapType = WrapType::Repeat;
+
+	//--
+	auto albedoTxt_1 = std::make_shared<Texture>("Model/Scanner/Albedo.png", TextureType::LDR, true);
+	albedoTxt_1->filterType = FilterType::Bilinear;
+	//albedoTxt_1->wrapType = WrapType::Repeat;
+
+	auto normalTxt_1 = std::make_shared<Texture>("Model/Scanner/Normal.png", TextureType::LDR, false);
+	normalTxt_1->filterType = FilterType::Bilinear;
+	//normalTxt_1->wrapType = WrapType::Repeat;
+
+	auto metallicTxt_1 = std::make_shared<Texture>("Model/Scanner/Metallic.png", TextureType::LDR, false);
+	metallicTxt_1->filterType = FilterType::Bilinear;
+	//metallicTxt_1->wrapType = WrapType::Repeat;
+
+	auto roughnessTxt_1 = std::make_shared<Texture>("Model/Scanner/Roughness.png", TextureType::LDR, false);
+	roughnessTxt_1->filterType = FilterType::Bilinear;
+	//roughnessTxt_1->wrapType = WrapType::Repeat;
+
+	auto aoTxt_1 = std::make_shared<Texture>("Model/Scanner/AO.png", TextureType::LDR, false);
+	aoTxt_1->filterType = FilterType::Bilinear;
+	//aoTxt_1->wrapType = WrapType::Repeat;
+
+	auto emissionTxt_1 = std::make_shared<Texture>("Model/Scanner/Emission.png", TextureType::LDR, false);
+	emissionTxt_1->filterType = FilterType::Bilinear;
+	//emissionTxt_1->wrapType = WrapType::Repeat;
+
+	auto irradianceTxt = std::make_shared<Texture3D>("Model/textures/valley_irradiance.hdr");
+	auto radianceTxt = std::make_shared<Texture3D>("Model/textures/valley_radiance.hdr");
+	auto brdfTxt = std::make_shared<Texture>("Model/textures/ibl_brdf_lut.png", TextureType::LDR, false);
+	brdfTxt->filterType = FilterType::Bilinear;
+	brdfTxt->wrapType = WrapType::Repeat;
 
 	Material phong_material;
 	Material phong_material2;
@@ -276,10 +311,26 @@ int main()
 	Material pbr_material1;
 	creataMaterial<PBRShader>(pbr_material1);
 	pbr_material1.shader->block.albedo = albedoTxt;
-	pbr_material1.shader->block.normal = normalTxt;
+	//pbr_material1.shader->block.normal = normalTxt;
 	pbr_material1.shader->block.metallic = metallicTxt;
 	pbr_material1.shader->block.roughness = roughnessTxt;
 	pbr_material1.shader->block.ao = aoTxt;
+	pbr_material1.shader->block.brdf = brdfTxt;
+	pbr_material1.shader->block.irradiance = irradianceTxt;
+	pbr_material1.shader->block.radiance = radianceTxt;
+	pbr_material1.shader->block.emission = emissionTxt;
+
+	Material pbr_material2;
+	creataMaterial<PBRShader>(pbr_material2);
+	pbr_material2.shader->block.albedo = albedoTxt_1;
+	pbr_material2.shader->block.normal = normalTxt_1;
+	pbr_material2.shader->block.metallic = metallicTxt_1;
+	pbr_material2.shader->block.roughness = roughnessTxt_1;
+	pbr_material2.shader->block.ao = aoTxt_1;
+	pbr_material2.shader->block.brdf = brdfTxt;
+	pbr_material2.shader->block.irradiance = irradianceTxt;
+	pbr_material2.shader->block.radiance = radianceTxt;
+	pbr_material2.shader->block.emission = emissionTxt_1;
 	//----------------------------------------------------------------------------
 
 
@@ -315,7 +366,7 @@ int main()
 	Global::pointLightList.push_back(std::move(pointLight2));
 
 	auto dirLight1 = make_unique<DirectionLight>(glm::vec3(1, 1, 1), 1, glm::vec4(1, 1, 1, 1), std::move(obj_light_3));
-	dirLight1->setTransform(glm::vec3(1, 1, 1), glm::vec3(0,70,0));
+	dirLight1->setTransform(glm::vec3(1, 1, 1), glm::vec3(0,0,0));
 	Global::dirLightList.push_back(std::move(dirLight1));
 	//----------------------------------------------------------------------------
 
@@ -344,8 +395,13 @@ int main()
 	//²âÊÔpbrÀý×Ó£º
 	Object obj_pbr_test("Model/Helmet/helmet.obj", pbr_material1);
 	obj_pbr_test.SetScale(0.1, 0.1, 0.1);
-	obj_pbr_test.SetRotate(0, 90, 0);
-	obj_pbr_test.SetTranslate(0, -0.5, 0.0 + 0.45);
+	obj_pbr_test.SetRotate(0, -90, 0);
+	obj_pbr_test.SetTranslate(0, 0, 0.0 + 0.45);
+
+	Object obj_pbr_test_1("Model/Scanner/Scanner.obj", pbr_material2);
+	obj_pbr_test_1.SetScale(0.0004, 0.0004, 0.0004);
+	obj_pbr_test_1.SetRotate(0, 90, 0);
+	obj_pbr_test_1.SetTranslate(0, -0.5, 0.0 + 0.45);
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -356,7 +412,7 @@ int main()
 #endif
 
 
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "SoftRender", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "FSoftRender", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -391,7 +447,7 @@ int main()
 		//		Global::frameBuffer->WriteColor(i,j, glm::vec4(1));
 		//}
 		
-		//skyboxObj->RenderObject();
+		skyboxObj->RenderObject();
 
 		for (size_t i = 0; i < Global::pointLightList.size(); i++)
 		{
@@ -401,9 +457,8 @@ int main()
 		{
 			Global::dirLightList[i]->obj->RenderObject();
 		}
-		preSkyObj->RenderObject();
-		
-		obj_pbr_test.RenderObject();                    
+		//preSkyObj->RenderObject();
+		obj_pbr_test.RenderObject();
 		//obj.RenderObject();
 		//obj1.RenderObject();
 		//
