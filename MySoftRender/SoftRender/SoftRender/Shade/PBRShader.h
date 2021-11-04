@@ -40,6 +40,7 @@ namespace softRD
 		{
 			//return glm::vec4(1);
 			glm::vec4 albedo = block.albedo->Sampler2D(v2f.texcoord);
+			glm::vec4 dirLight = glm::vec4(0);
 			float ao = block.ao->Sampler2D(v2f.texcoord).r;
 			//return albedo;
 			//glm::vec3 N = fMath::UnPackNormal(block.normal->Sampler2D(v2f.texcoord));
@@ -54,21 +55,48 @@ namespace softRD
 				N = fMath::UnPackNormal(block.normal->Sampler2D(v2f.texcoord));
 			}
 			N = glm::normalize(N);
-			//return glm::vec4(N, 1);
-			glm::vec3 L_dir = glm::normalize(Global::dirLightList[0]->dirction);
 			glm::vec3 V = glm::normalize(Global::mainCamera->position - glm::vec3(v2f.worldPos));
-			glm::vec3 N_half = glm::normalize(L_dir + V);
-
 			float metallic = block.metallic->Sampler2D(v2f.texcoord).r;
 			float roughness = block.roughness->Sampler2D(v2f.texcoord).r;
 			//roughness = 0.2;
-			float NdotH = std::max(0.f,glm::dot(N, N_half));
-			float NdotV = std::max(glm::dot(N, V),0.f);
-			float HdotV = std::max(glm::dot(N_half, V), 0.f);
-			float NdotL = std::max(glm::dot(N, L_dir), 0.f);
+			float NdotV = std::max(glm::dot(N, V), 0.f);
 
-			glm::vec4 dirLight = CalDirLight(albedo, V, N, L_dir, roughness, metallic, NdotH, NdotV, HdotV, NdotL);
+			for (size_t index = 0; index < Global::pointLightList.size(); index++)
+			{
+				//auto L = glm::normalize(Global::pointLightList[index]->position - glm::vec3(v2f.worldPos));
+				auto L_color = Global::pointLightList[index]->color;
+				auto L_Intensity = Global::pointLightList[index]->intensity;
+				auto L_Att = Global::pointLightList[index]->getAttenuation(v2f.worldPos);
+				//res_Col += col * std::max(0.001f, glm::dot(L, N)) * glm::vec4(c, 1) * i * a;
+
+				glm::vec3 L_dir = glm::normalize(Global::pointLightList[index]->position - glm::vec3(v2f.worldPos));
+				glm::vec3 N_half = glm::normalize(L_dir + V);
+
+				float NdotH = std::max(0.f, glm::dot(N, N_half));
+				float NdotL = std::max(glm::dot(N, L_dir), 0.f);
+				float HdotV = std::max(glm::dot(N_half, V), 0.f);
+
+				dirLight += CalDirLight(albedo, V, N, L_dir, roughness, metallic, NdotH, NdotV, HdotV, NdotL)*L_Intensity*L_Att*glm::vec4(L_color,1);
+			}
+			for (size_t index = 0; index < Global::dirLightList.size(); index++)
+			{
+				auto L_Intensity = Global::dirLightList[index]->intensity;
+				auto L_color = Global::dirLightList[index]->color;
+				auto L_Att = Global::dirLightList[index]->getAttenuation(v2f.worldPos);
+
+				glm::vec3 L_dir = -glm::normalize(Global::dirLightList[index]->dirction);
+				glm::vec3 N_half = glm::normalize(L_dir + V);
+
+				float NdotH = std::max(0.f, glm::dot(N, N_half));
+				float NdotL = std::max(glm::dot(N, L_dir), 0.f);
+				float HdotV = std::max(glm::dot(N_half, V), 0.f);
+
+				dirLight += CalDirLight(albedo, V, N, L_dir, roughness, metallic, NdotH, NdotV, HdotV, NdotL)*L_Intensity*L_Att;
+			}
+			//return glm::vec4(N, 1);
+			
 			glm::vec4 inDirLight = CalInDirLight(albedo,v2f.worldPos,V,N,metallic,roughness,NdotV);
+			//inDirLight = glm::vec4(0);
 			//return dirLight;
 			glm::vec4 res = (dirLight + inDirLight) * ao + block.emission->Sampler2D(v2f.texcoord);
 			return fMath::Srgb2Linear(fMath::FloatAces(res));

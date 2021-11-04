@@ -161,7 +161,8 @@ void showfps(GLFWwindow* window)
 	while (1)
 	{
 		Sleep(1000);
-		string txt = "FPS:" + std::to_string(fps);
+		string txt = "F-SoftRender   ";
+		txt +="FPS:" + std::to_string(fps);
 		glfwSetWindowTitle(window, txt.c_str());
 
 		fps = 0;
@@ -359,10 +360,10 @@ int main()
 	//obj.RenderObject();
 
 	//-----------------------------------------------------------------------------´´½¨µÆ¹â
-	auto pointLight1 = make_unique<PointLight>(glm::vec3(0, 0.0, 0.74), 2.8, glm::vec4(1, 0.8, 1, 1),std::move(obj_light_1), 0.3);
+	auto pointLight1 = make_unique<PointLight>(glm::vec3(0, 0.0, 0.54), 5.8, glm::vec4(1, 0.1, 1, 1),std::move(obj_light_1), 0.3);
 	Global::pointLightList.push_back(std::move(pointLight1));
 
-	auto pointLight2 = make_unique<PointLight>(glm::vec3(0.3, 0.3, 0.85), 1.1, glm::vec4(0.7, 1, 1, 1), std::move(obj_light_2), 1.5);
+	auto pointLight2 = make_unique<PointLight>(glm::vec3(-0.2, 0.1, 0.35), 1.1, glm::vec4(0.1, 1, 1, 1), std::move(obj_light_2), 1.5);
 	Global::pointLightList.push_back(std::move(pointLight2));
 
 	auto dirLight1 = make_unique<DirectionLight>(glm::vec3(1, 1, 1), 1, glm::vec4(1, 1, 1, 1), std::move(obj_light_3));
@@ -404,8 +405,8 @@ int main()
 	obj_pbr_test_1.SetTranslate(0, -0.5, 0.0 + 0.45);
 
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 #ifdef __APPLE__
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -466,6 +467,7 @@ int main()
 		////glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		////glClear(GL_COLOR_BUFFER_BIT);
 		////
+
 		glDrawPixels(Global::frameBuffer->width, Global::frameBuffer->height, GL_RGBA, GL_UNSIGNED_BYTE, Global::frameBuffer->colorBuffer.data());
 		glfwSwapBuffers(window);
 		glfwPollEvents();
